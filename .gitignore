@@ -1,0 +1,47 @@
+# === CLion / JetBrains ===
+.idea/
+cmake-build-*/
+CMakeLists.txt.user
+CMakeLists.txt
+cmake_install.cmake
+CMakeCache.txt
+Makefile
+
+# === VSCode ===
+.vscode/
+
+# === C binaries and build artifacts ===
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.so
+*.dll
+*.dylib
+
+# === Debug/Release folders (common names) ===
+Debug/
+Release/
+
+# === Logs and temporary files ===
+*.log
+*.tmp
+*.swp
+*~
+
+# === OS-specific ===
+.DS_Store
+Thumbs.db
+
+# === Backup files ===
+*.bak
+*.old
+*.orig
+
+# === Core dumps ===
+core
+core.*
+
+# === Compiled docs ===
+*.dox
