@@ -2,6 +2,19 @@
 
 # Personas Implicadas
 
+## Ministerio Público
+### Añadir
+- [ ] Fical (Circular Simple) - enlazarFiscal()
+- [ ] Juez de garantía (Circular Simple) - enlazarJuez()
+### Modificar
+- [ ] Fical (Circular Simple) - enlazarFiscal()
+- [ ] Juez de garantía (Circular Simple) - enlazarJuez()
+### Buscar
+- [ ] Fical (Circular Simple) - enlazarFiscal()
+- [ ] Juez de garantía (Circular Simple) - enlazarJuez()
+### Eliminar
+- [ ] Fical (Circular Simple) - enlazarFiscal()
+- [ ] Juez de garantía (Circular Simple) - enlazarJuez()
 ## Fiscales
 
 ### Añadir
