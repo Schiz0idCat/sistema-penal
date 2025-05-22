@@ -4,7 +4,6 @@
 
 // Pruebas
 #define maxCategoria 4       // declaraciones, informes, grabaciones, documentos, evidencias
-#define maxStrCategoria 13   // "declaraciones", 13 caracteres en total
 #define maxStrData 100       // la información de una prueba almacenada en un string
 
 // Personas
@@ -21,7 +20,7 @@
 
 struct Prueba {
     int id;
-    char *categoria;
+    int categoria; // 0: declaraciones; 1: informes; 2: grabaciones; 3: documentos; 4: evidencias
     char *data;
 };
 
@@ -85,13 +84,13 @@ void mostrarCategoriasPruebas(struct NodoPrueba **pruebas) {
     int i;
 
     for (i = 0; i < maxCategoria; i++) {
-        printf("Categoria %d: %s\n", i + 1, pruebas[i]->prueba->categoria);
+        printf("Categoria %d: %d\n", i + 1, pruebas[i]->prueba->categoria);
     }
 }
 
 void mostrarPrueba(struct Prueba *prueba){
     printf("id: %d\n", prueba->id);
-    printf("categoria: %s\n", prueba->categoria);
+    printf("categoria: %d\n", prueba->categoria);
     printf("data: %s\n\n", prueba->data);
 }
 
@@ -109,7 +108,6 @@ struct Prueba *crearPrueba() {
     prueba = (struct Prueba *)malloc(sizeof(struct Prueba));
     
     prueba->id = 0;
-    prueba->categoria = (char *)malloc(sizeof(char) * maxStrRol);
     prueba->data = (char *)malloc(sizeof(char) * maxStrData);
 
     return prueba;
@@ -120,7 +118,7 @@ void inputCrearPrueba(struct Prueba *prueba) {
     scanf("%d", &prueba->id);
     
     printf("Ingrese la categoria de la prueba: ");
-    scanf(" %[^\n]", prueba->categoria);
+    scanf("%d", &prueba->categoria);
 
     printf("Ingrese los datos de la prueba: ");
     scanf(" %[^\n]", prueba->data);
