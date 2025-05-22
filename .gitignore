@@ -10,6 +10,9 @@ Makefile
 # === VSCode ===
 .vscode/
 
+# === obsidian ===
+.obsidian/
+
 # === C binaries and build artifacts ===
 *.o
 *.obj
