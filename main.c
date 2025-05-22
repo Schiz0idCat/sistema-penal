@@ -45,9 +45,6 @@ struct Persona {
     // JUEZ: apunta al fiscal con quien se comunica
     struct Persona *fiscal; // implicado apunta al juez que lleva su caso
 
-    // ROL IMPLICADO:
-    int medidaCautelar; // 0: no tiene medida cautelar; 1: sí tiene medida cautelar
-
     // ROL FISCAL:
     struct Persona *juez;
     struct Caso **casosActivos;
@@ -56,7 +53,7 @@ struct Persona {
 struct Caso {
     char *ruc;
     char *estado;
-    char *nombreClave;
+    int medidaCautelar; // DEFINIR TIPOS DE MEDIDAS CAUTELARES
     struct NodoPrueba **categoriasPruebas;   // array de NodoPrueba (array de listas doblemente enlazadas)
     struct NodoPersona *implicados;          // simple enlazada
     struct Persona *fiscal;
@@ -214,8 +211,6 @@ struct Persona *crearImplicado(struct Persona *fiscal) {
     implicado->rol = (char *)malloc(sizeof(char) * maxStrRol);
     implicado->rut = (char *)malloc(sizeof(char) * maxStrRut);
     implicado->nombre = (char *)malloc(sizeof(char) * maxStrNombre);
-
-    implicado->medidaCautelar = 0;
 
     implicado->fiscal = fiscal;
 
