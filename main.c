@@ -2,19 +2,22 @@
 #include <stdlib.h>
 #include <string.h>
 
-// pruebas
+// Pruebas
 #define maxCategoria 4       // declaraciones, informes, grabaciones, documentos, evidencias
-#define maxStrCategoria 13   //
-#define maxStrData 100       //
+#define maxStrCategoria 13   // "declaraciones", 13 caracteres en total
+#define maxStrData 100       // la información de una prueba almacenada en un string
 
-// personas
+// Personas
 #define maxStrRut 12         // "12.345.678-9", 12 caracteres en total  
 #define maxStrRol 9          // "implicado" es el str más largo dentro de los roles
-#define maxStrNombre 20      //
+#define maxStrNombre 20      // máxima longitud de un nombre
 
-// casos
-#define maxStrEstado
-#define maxStrRuc
+// Casos
+#define maxStrEstado         // "cerrado", "archivado"
+#define maxStrRuc            // máxima longitud de un ruc
+
+// Fiscales
+#define maxCasosActivos 5    // casos en los que trabaja un fiscal al mismo tiempo
 
 struct Prueba {
     int id;
@@ -22,7 +25,8 @@ struct Prueba {
     char *data;
 };
 
-struct NodoPrueba { // doble enlazada
+// doble enlazada
+struct NodoPrueba {
     struct Prueba *prueba;
     struct NodoPrueba *sig, *ant;
 };
@@ -46,8 +50,7 @@ struct Persona {
 
     // ROL FISCAL:
     struct Persona *juez;
-    struct Caso *casosActivos;
-    int maxCasosActivos;
+    struct Caso **casosActivos;
 };
 
 struct Caso {
@@ -55,7 +58,7 @@ struct Caso {
     char *estado;
     char *nombreClave;
     struct NodoPrueba **categoriasPruebas;   // array de NodoPrueba (array de listas doblemente enlazadas)
-    struct NodoImplicado *implicados;        // simple enlazada
+    struct NodoPersona *implicados;          // simple enlazada
     struct Persona *fiscal;
 };
 
@@ -75,15 +78,18 @@ struct NodoSIAU {
 };
 
 struct MinPublico {
-    struct NodoJuez *jueces;       // circular simple
-    struct NodoFiscal *fiscales;   // circular simple
-    struct NodoSIAU *siau;         // árbol
+    struct NodoPersona *jueces;     // circular simple
+    struct NodoPersona *fiscales;   // circular simple
+    struct NodoSIAU *siau;          // árbol
 };
 
 //==========>   PRUEBAS   <==========//
 void mostrarCategoriasPruebas(struct NodoPrueba **pruebas) {
-    for (int i = 0; i < maxCategoria; i++)
-        printf("Categoria %d: %s\n\n", i + 1, pruebas[i]->prueba->categoria);
+    int i;
+
+    for (i = 0; i < maxCategoria; i++) {
+        printf("Categoria %d: %s\n", i + 1, pruebas[i]->prueba->categoria);
+    }
 }
 
 void mostrarPrueba(struct Prueba *prueba){
@@ -101,7 +107,9 @@ void mostrarListaPruebas(struct NodoPrueba *pruebas) {
 }
 
 struct Prueba *crearPrueba() {
-    struct Prueba *prueba = malloc(sizeof(struct Prueba));
+    struct Prueba *prueba;
+
+    prueba = (struct Prueba *)malloc(sizeof(struct Prueba));
     
     prueba->id = 0;
     prueba->categoria = (char *)malloc(sizeof(char) * maxStrRol);
@@ -125,6 +133,7 @@ struct NodoPrueba *crearNodoPrueba(struct Prueba *prueba) {
     struct NodoPrueba *nuevoNodo;
 
     nuevoNodo = (struct NodoPrueba *)malloc(sizeof(struct NodoPrueba));
+    
     nuevoNodo->prueba = prueba;
     nuevoNodo->sig = NULL;
     nuevoNodo->ant = NULL;
@@ -133,18 +142,21 @@ struct NodoPrueba *crearNodoPrueba(struct Prueba *prueba) {
 }
 
 void agregarPrueba(struct NodoPrueba **pruebas, struct Prueba *prueba) {
-    struct NodoPrueba *nuevoNodo = crearNodoPrueba(prueba);
+    struct NodoPrueba *nuevoNodo;
+    struct NodoPrueba *ultimo;
+    
+    nuevoNodo = crearNodoPrueba(prueba);
+    ultimo = *pruebas;
 
     if (*pruebas == NULL) {
         *pruebas = nuevoNodo;
 
         return;
-    }
+    }   
 
-    struct NodoPrueba *ultimo = *pruebas;
-
-    while (ultimo->sig != NULL)
+    while (ultimo->sig != NULL) {
         ultimo = ultimo->sig;
+    }
 
     ultimo->sig = nuevoNodo;
     nuevoNodo->ant = ultimo;
@@ -152,8 +164,9 @@ void agregarPrueba(struct NodoPrueba **pruebas, struct Prueba *prueba) {
 
 struct Prueba *buscarPrueba(struct NodoPrueba *pruebas, int id) {
     while (pruebas != NULL) {
-        if (pruebas->prueba->id == id) 
+        if (pruebas->prueba->id == id) {
             return pruebas->prueba;
+        }
 
         pruebas = pruebas->sig;
     }
@@ -161,7 +174,9 @@ struct Prueba *buscarPrueba(struct NodoPrueba *pruebas, int id) {
     return NULL;
 }
 
-int eliminarPrueba(struct NodoPrueba **pruebas, struct Prueba *prueba) {}
+int eliminarPrueba(struct NodoPrueba **pruebas, struct Prueba *prueba);
+
+void modificarPrueba(struct Prueba *prueba);
 
 //==========>   CASOS   <==========//
 void mostrarCaso(struct Caso *caso);
@@ -169,6 +184,7 @@ void mostrarArbolCasos(struct NodoSIAU *siau);
 struct Caso *buscarCaso(char *ruc);
 struct Caso *crearCaso();
 void inputCrearCaso(struct Caso *caso);
+void crearNodoCaso(struct Caso *caso);
 void agregarCaso(struct NodoSIAU *siau, struct Caso *caso);
 void modificarCaso(struct Caso *caso);
 int eliminarCaso(struct Caso *caso);
@@ -191,7 +207,9 @@ void mostrarListaImplicados(struct NodoPersona *implicados) {
 }
 
 struct Persona *crearImplicado(struct Persona *fiscal) {
-    struct Persona *implicado = malloc(sizeof(struct Persona));
+    struct Persona *implicado;
+    
+    implicado = (struct Persona *)malloc(sizeof(struct Persona));
 
     implicado->rol = (char *)malloc(sizeof(char) * maxStrRol);
     implicado->rut = (char *)malloc(sizeof(char) * maxStrRut);
@@ -216,27 +234,40 @@ void inputCrearImplicado(struct Persona *persona) {
 
 }
 
-struct NodoPersona *crearNodoImplicado(struct Persona *persona) {
-    struct NodoPersona *implicado;
+struct NodoPersona *crearNodoImplicado(struct Persona *implicado) {
+    struct NodoPersona *NodoImplicado;
 
-    implicado = (struct NodoPersona *)malloc(sizeof(struct NodoPersona));
-    implicado->persona = persona; 
-    implicado->sig = NULL;
+    NodoImplicado = (struct NodoPersona *)malloc(sizeof(struct NodoPersona));
+
+    NodoImplicado->persona = implicado; 
+    NodoImplicado->sig = NULL;
     
-    return implicado;
+    return NodoImplicado;
 }
 
-void agregarImplicado(struct NodoPersona *implicados, struct NodoPersona *implicado) {
-    while (implicados->sig != NULL)
-        implicados = implicados->sig;
+void agregarImplicado(struct NodoPersona **implicados, struct NodoPersona *implicado) {
+    struct NodoPersona *ultimo;
+    
+    ultimo = *implicados;
+    
+    if (*implicados == NULL) {
+        *implicados = implicado;
 
-    implicados->sig = implicado;
+        return;
+    }
+    
+    while (ultimo->sig != NULL) {
+        ultimo = ultimo->sig;
+    }
+
+    ultimo->sig = implicado;
 }
 
 struct Persona *buscarImplicado(struct NodoPersona *implicados, char *rut) {
     while (implicados != NULL) {
-        if (strcmp(implicados->persona->rut, rut) == 0)
+        if (strcmp(implicados->persona->rut, rut) == 0) {
             return implicados->persona;
+        }
 
         implicados = implicados->sig;
     }
@@ -254,11 +285,183 @@ void mostrarFiscal(struct Persona *fiscal) {
     printf("Rut juez a cargo: %s\n\n", fiscal->juez->rut);
 }
 
+// circular simple
+void mostrarListaFiscales(struct NodoPersona *fiscales) { 
+    struct NodoPersona *actual;
+    
+    actual = fiscales;
+
+    do {
+        mostrarFiscal(actual->persona);
+        actual = actual->sig;
+    } while (actual != fiscales);
+}
+
+struct Persona *crearFiscal() {
+    struct Persona *fiscal;
+    
+    fiscal = malloc(sizeof(struct Persona));
+
+    fiscal->rol = (char *)malloc(sizeof(char) * maxStrRol);
+    fiscal->rut = (char *)malloc(sizeof(char) * maxStrRut);
+    fiscal->nombre = (char *)malloc(sizeof(char) * maxStrNombre);
+
+    fiscal->juez = NULL;
+    fiscal->casosActivos = (struct Caso **)malloc(sizeof(struct Caso *) * maxCasosActivos);
+
+    return fiscal;
+}
+
+void inputCrearImplicado(struct Persona *fiscal);
+
+// nodo simple
+struct NodoPersona *crearNodoFiscal(struct Persona *fiscal) {
+    struct NodoPersona *nuevoNodo;
+
+    nuevoNodo = (struct NodoPersona *)malloc(sizeof(struct NodoPersona));
+    
+    nuevoNodo->persona = fiscal;
+    nuevoNodo->sig = NULL;
+
+    return nuevoNodo;
+}
+
+// circular simple
+void agregarFiscal(struct NodoPersona **fiscales, struct Persona *fiscal) { 
+    struct NodoPersona *nuevoNodo;
+    struct NodoPersona *ultimo;
+    
+    nuevoNodo = crearNodoFiscal(fiscal);
+    
+    ultimo = *fiscales;
+
+    if (*fiscales == NULL) {
+        *fiscales = nuevoNodo;
+        nuevoNodo->sig = nuevoNodo;
+        return;
+    }
+
+    while (ultimo->sig != *fiscales) {
+        ultimo = ultimo->sig;
+    }
+
+    ultimo->sig = nuevoNodo;
+    nuevoNodo->sig = *fiscales;
+}
+
+// circular simple
+struct Persona *buscarFiscal(struct NodoPersona *fiscales, char *rut) {
+    struct NodoPersona *actual;
+    
+    actual = fiscales;
+
+    do {
+        if (strcmp(actual->persona->rut, rut) == 0) {
+            return actual->persona;
+        }
+
+        actual = actual->sig;
+    } while (actual != fiscales);
+
+    return NULL;
+}
+
+int eliminarFiscal(struct NodoPersona **implicados, char *rut);
+
 //==========>   Juez   <==========//
 void mostrarJuez(struct Persona *juez) {
     printf("nombre: %s\n", juez->nombre);
     printf("rut: %s\n", juez->rut);
 }
+
+// circular simple
+void mostrarListaJueces(struct NodoPersona *jueces) { 
+    struct NodoPersona *actual;
+    
+    actual = jueces;
+
+    do {
+        mostrarJuez(actual->persona);
+        actual = actual->sig;
+    } while (actual != jueces);
+}
+
+struct Persona *crearJuez(struct Persona *fiscal) {
+    struct Persona *juez;
+    
+    juez = (struct Persona *)malloc(sizeof(struct Persona));
+
+    juez->rol = (char *)malloc(sizeof(char) * maxStrRol);
+    juez->rut = (char *)malloc(sizeof(char) * maxStrRut);
+    juez->nombre = (char *)malloc(sizeof(char) * maxStrNombre);
+    juez->fiscal = fiscal;
+
+    return juez;
+}
+
+void inputCrearJuez(struct Persona *juez) {
+    printf("Ingrese el rol de la persona: ");
+    scanf(" %[^\n]", juez->rol);
+
+    printf("Ingrese el nombre de la persona: ");
+    scanf(" %[^\n]", juez->nombre);
+
+    printf("Ingrese el rut de la persona: ");
+    scanf(" %[^\n]", juez->rut);
+}
+
+// nodo simple
+struct NodoPersona *crearNodoJuez(struct Persona *juez) { 
+    struct NodoPersona *nuevoNodo;
+
+    nuevoNodo = (struct NodoPersona *)malloc(sizeof(struct NodoPersona));
+    
+    nuevoNodo->persona = juez;
+    nuevoNodo->sig = NULL;
+
+    return nuevoNodo;
+}
+
+// circular simple
+void agregarJuez(struct NodoPersona **jueces, struct Persona *juez) {
+    struct NodoPersona *nuevoNodo;
+    struct NodoPersona *ultimo;
+
+    nuevoNodo = crearNodoJuez(juez);
+    ultimo = *jueces;
+
+    if (*jueces == NULL) {
+        *jueces = nuevoNodo;
+        nuevoNodo->sig = nuevoNodo;
+        return;
+    }
+
+    while (ultimo->sig != *jueces) {
+        ultimo = ultimo->sig;
+    }
+
+    ultimo->sig = nuevoNodo;
+    nuevoNodo->sig = *jueces;
+}
+
+struct Persona *buscarJuez(struct NodoPersona *jueces, char *rut) { // circular simple
+    struct NodoPersona *actual;
+
+    actual = jueces;
+
+    do {
+        if (strcmp(actual->persona->rut, rut) == 0) {
+            return actual->persona;
+        }
+
+        actual = actual->sig;
+    } while (actual != jueces);
+
+    return NULL;
+}
+
+// circular simple
+int eliminarJuez(struct NodoPersona **jueces, char *rut);
 
 int main() {
 
