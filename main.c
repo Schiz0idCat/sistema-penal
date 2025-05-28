@@ -401,15 +401,14 @@ void mostrarJuez(struct Persona *juez) {
 }
 
 // Array
-void mostrarListaJueces(struct Persona **jueces, int maxJueces) { 
+void mostrarListaJueces(struct Persona **jueces) { 
     int i;
-    for (i = 0; i < maxJueces; i++) {
-        if( jueces[i] == NULL) {
-            continue; // Si el juez es NULL, no lo mostramos
-        }
 
-        mostrarJuez(jueces[i]);
-    }
+    for (i = 0; i < maxJueces; i++) {
+        if( jueces[i] != NULL) {
+            mostrarJuez(jueces[i]);
+        }
+    }   
 }
 
 struct Persona *crearJuez() {
@@ -436,21 +435,25 @@ void inputCrearJuez(struct Persona *juez) {
 }
 
 // agregar al juez al array
-void agregarJuez(struct Persona **jueces, struct Persona *juez) {
+int agregarJuez(struct Persona **jueces, struct Persona *juez) {
     int i;
+
     for (i = 0; i < maxJueces; i++) {
         if (jueces[i] == NULL) {
             jueces[i] = juez;
-            return;
+
+            return 1; // Agregado con éxito
         }
     }
 
-    printf("No se pueden agregar más jueces\n");
+    return 0; // No se pudo agregar, el array está lleno
 }
 
 // buscar juez por rut en el array
-struct Persona *buscarJuez(struct Persona **jueces,  int maxJueces, char *rut) { 
-    for (int i = 0; i < maxJueces; i++) {
+struct Persona *buscarJuez(struct Persona **jueces, char *rut) { 
+    int i;
+
+    for (i = 0; i < maxJueces; i++) {
         if (jueces[i] != NULL && strcmp(jueces[i]->rut, rut) == 0) {
             return jueces[i];
         }
@@ -460,22 +463,18 @@ struct Persona *buscarJuez(struct Persona **jueces,  int maxJueces, char *rut) {
 }
 
 // eliminar a juez del Array
-int eliminarJuez(struct Persona *jueces[], int maxJueces, char *rut){
+int eliminarJuez(struct Persona **jueces, char *rut){
     int i;
 
     for (i = 0; i < maxJueces; i++) {
         if (jueces[i] != NULL && strcmp(jueces[i]->rut, rut) == 0) {
-            free(jueces[i]->rol);
-            free(jueces[i]->rut);
-            free(jueces[i]->nombre);
-            free(jueces[i]);
             jueces[i] = NULL;
-            
-            return 0; // Eliminado con éxito
+
+            return 1; // Eliminado con éxito
         }
     }
 
-    return 1; // No encontrado
+    return 0; // No encontrado
 }
 
 int main() {
