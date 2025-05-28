@@ -400,7 +400,6 @@ void mostrarJuez(struct Persona *juez) {
     printf("rut: %s\n", juez->rut);
 }
 
-// Array
 void mostrarListaJueces(struct Persona **jueces) { 
     int i;
 
@@ -434,7 +433,6 @@ void inputCrearJuez(struct Persona *juez) {
     scanf(" %[^\n]", juez->rut);
 }
 
-// agregar al juez al array
 int agregarJuez(struct Persona **jueces, struct Persona *juez) {
     int i;
 
@@ -449,7 +447,6 @@ int agregarJuez(struct Persona **jueces, struct Persona *juez) {
     return 0; // No se pudo agregar, el array está lleno
 }
 
-// buscar juez por rut en el array
 struct Persona *buscarJuez(struct Persona **jueces, char *rut) { 
     int i;
 
@@ -462,7 +459,6 @@ struct Persona *buscarJuez(struct Persona **jueces, char *rut) {
     return NULL;
 }
 
-// eliminar a juez del Array
 int eliminarJuez(struct Persona **jueces, char *rut){
     int i;
 
