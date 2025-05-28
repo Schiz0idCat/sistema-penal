@@ -4,7 +4,6 @@
 
 // Pruebas
 #define maxCategoria 4       // declaraciones, informes, grabaciones, documentos, evidencias
-#define maxStrCategoria 13   // "declaraciones", 13 caracteres en total
 #define maxStrData 100       // la información de una prueba almacenada en un string
 
 // Personas
@@ -13,15 +12,14 @@
 #define maxStrNombre 20      // máxima longitud de un nombre
 
 // Casos
-#define maxStrEstado         // "cerrado", "archivado"
 #define maxStrRuc            // máxima longitud de un ruc
 
 // Fiscales
-#define maxCasosActivos 5    // casos en los que trabaja un fiscal al mismo tiempo
+#define maxCasos 100         // casos en los que puede llegar a trabajar un fiscal
 
 struct Prueba {
     int id;
-    char *categoria;
+    int categoria; // 0: declaraciones; 1: informes; 2: grabaciones; 3: documentos; 4: evidencias
     char *data;
 };
 
@@ -34,38 +32,33 @@ struct NodoPrueba {
 /* con este struct se gestionan:
  * Implicados en el caso (víctima, imputado, testigo, terceros)
  * Ficales
+ * Jueces
  */
 struct Persona {
     char *rol;
     char *rut;
     char *nombre;
 
-    // ROL IMPLICADO - JUEZ:
-    // IMPLICADO: apunta al juez que lleva su caso
-    // JUEZ: apunta al fiscal con quien se comunica
-    struct Persona *fiscal; // implicado apunta al juez que lleva su caso
-
     // ROL IMPLICADO:
     int medidaCautelar; // 0: no tiene medida cautelar; 1: sí tiene medida cautelar
 
     // ROL FISCAL:
-    struct Persona *juez;
-    struct Caso **casosActivos;
+    struct Caso **casos;
 };
 
 struct Caso {
     char *ruc;
-    char *estado;
-    char *nombreClave;
+    int estado;                              // 0: activo; 1: archivado
+    int medidaCautelar;                      // 0: sin medida cautelar; 1: con medida cautela
     struct NodoPrueba **categoriasPruebas;   // array de NodoPrueba (array de listas doblemente enlazadas)
-    struct NodoPersona *implicados;          // simple enlazada
+    struct NodoPersona **implicados;         // array de implicados al caso (array de listas simplemente enlazadas)
     struct Persona *fiscal;
 };
 
 /* Lista que gestiona personas
  * Consideraciones:
  * - la lista de implicados es simplemente enlazada
- * - lista de fiscales y jueces es circular simplemente enlazada
+ * - lista de fiscales es circular simplemente enlazada
  */
 struct NodoPersona {
     struct Persona *persona;
@@ -88,13 +81,13 @@ void mostrarCategoriasPruebas(struct NodoPrueba **pruebas) {
     int i;
 
     for (i = 0; i < maxCategoria; i++) {
-        printf("Categoria %d: %s\n", i + 1, pruebas[i]->prueba->categoria);
+        printf("Categoria %d: %d\n", i + 1, pruebas[i]->prueba->categoria);
     }
 }
 
 void mostrarPrueba(struct Prueba *prueba){
     printf("id: %d\n", prueba->id);
-    printf("categoria: %s\n", prueba->categoria);
+    printf("categoria: %d\n", prueba->categoria);
     printf("data: %s\n\n", prueba->data);
 }
 
@@ -111,8 +104,8 @@ struct Prueba *crearPrueba() {
 
     prueba = (struct Prueba *)malloc(sizeof(struct Prueba));
     
-    prueba->id = 0;
-    prueba->categoria = (char *)malloc(sizeof(char) * maxStrRol);
+    prueba->id = -1;
+    prueba->categoria = -1;
     prueba->data = (char *)malloc(sizeof(char) * maxStrData);
 
     return prueba;
@@ -123,7 +116,7 @@ void inputCrearPrueba(struct Prueba *prueba) {
     scanf("%d", &prueba->id);
     
     printf("Ingrese la categoria de la prueba: ");
-    scanf(" %[^\n]", prueba->categoria);
+    scanf(" %d", &prueba->categoria);
 
     printf("Ingrese los datos de la prueba: ");
     scanf(" %[^\n]", prueba->data);
@@ -174,7 +167,43 @@ struct Prueba *buscarPrueba(struct NodoPrueba *pruebas, int id) {
     return NULL;
 }
 
-int eliminarPrueba(struct NodoPrueba **pruebas, struct Prueba *prueba);
+struct NodoPrueba *buscarNodoPrueba(struct NodoPrueba *pruebas, int id) {
+    while (pruebas != NULL) {
+        if (pruebas->prueba->id == id) {
+            return pruebas;
+        }
+
+        pruebas = pruebas->sig;
+    }
+
+    return NULL;
+}
+
+int eliminarPrueba(struct NodoPrueba **pruebas, struct Prueba *prueba) {
+    struct NodoPrueba *nodoEliminar;
+
+    nodoEliminar = buscarNodoPrueba(*pruebas, prueba->id);
+
+    if (nodoEliminar != NULL) {
+        if (nodoEliminar->ant == NULL) {
+            *pruebas = (*pruebas)->sig;
+
+            if (*pruebas != NULL) {
+                (*pruebas)->ant = NULL;
+            }
+        }
+        else {
+            nodoEliminar->sig->ant = nodoEliminar->sig;
+        }
+
+        nodoEliminar->sig = NULL;
+        nodoEliminar->ant = NULL;
+
+        return 0;
+    }
+
+    return 1;
+}
 
 void modificarPrueba(struct Prueba *prueba);
 
@@ -194,8 +223,6 @@ void mostrarImplicado(struct Persona *implicado) {
     printf("rol: %s\n", implicado->rol);
     printf("nombre: %s\n", implicado->nombre);
     printf("rut: %s\n", implicado->rut);
-    printf("Fiscal a cargo: %s\n", implicado->fiscal->nombre);
-    printf("Rut fiscal a cargo: %s\n\n", implicado->fiscal->rut);
 }   
 
 void mostrarListaImplicados(struct NodoPersona *implicados) {
@@ -216,8 +243,6 @@ struct Persona *crearImplicado(struct Persona *fiscal) {
     implicado->nombre = (char *)malloc(sizeof(char) * maxStrNombre);
 
     implicado->medidaCautelar = 0;
-
-    implicado->fiscal = fiscal;
 
     return implicado;
 }
@@ -281,8 +306,6 @@ int eliminarImplicado(struct NodoPersona **implicados, char *rut);
 void mostrarFiscal(struct Persona *fiscal) {
     printf("nombre: %s\n", fiscal->nombre);
     printf("rut: %s\n", fiscal->rut);
-    printf("Juez a cargo: %s\n", fiscal->juez->nombre);
-    printf("Rut juez a cargo: %s\n\n", fiscal->juez->rut);
 }
 
 // circular simple
@@ -306,8 +329,7 @@ struct Persona *crearFiscal() {
     fiscal->rut = (char *)malloc(sizeof(char) * maxStrRut);
     fiscal->nombre = (char *)malloc(sizeof(char) * maxStrNombre);
 
-    fiscal->juez = NULL;
-    fiscal->casosActivos = (struct Caso **)malloc(sizeof(struct Caso *) * maxCasosActivos);
+    fiscal->casos = (struct Caso **)malloc(sizeof(struct Caso *) * maxCasos);
 
     return fiscal;
 }
@@ -371,6 +393,7 @@ int eliminarFiscal(struct NodoPersona **implicados, char *rut);
 //==========>   Juez   <==========//
 void mostrarJuez(struct Persona *juez) {
     printf("nombre: %s\n", juez->nombre);
+    printf("rol: %s\n", juez->rol);
     printf("rut: %s\n", juez->rut);
 }
 
@@ -394,7 +417,6 @@ struct Persona *crearJuez(struct Persona *fiscal) {
     juez->rol = (char *)malloc(sizeof(char) * maxStrRol);
     juez->rut = (char *)malloc(sizeof(char) * maxStrRut);
     juez->nombre = (char *)malloc(sizeof(char) * maxStrNombre);
-    juez->fiscal = fiscal;
 
     return juez;
 }
