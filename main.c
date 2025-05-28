@@ -475,5 +475,90 @@ int eliminarJuez(struct Persona **jueces, char *rut){
 
 int main() {
 
+    while (1) { //MIENTRAS EN EL USUARIO NO QUIERA SALIR DEL PROGRAMA
+        printf("Bienvenido al sistema de gestión de casos judiciales.\n");
+        printf("Ingrese 0 para salir del programa.\n");
+
+        // Selección de opción
+        int opcion;
+        printf("Seleccione una opción para probar:\n");
+        printf("1. Pruebas\n");
+        printf("2. Implicados\n");
+        printf("3. Fiscales\n");
+        printf("4. Jueces\n");
+        printf("Opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1: {
+                // Pruebas
+                struct Prueba *p = crearPrueba();
+                inputCrearPrueba(p);
+                mostrarPrueba(p);
+
+                struct NodoPrueba *lista = NULL;
+                agregarPrueba(&lista, p);
+                mostrarListaPruebas(lista);
+
+                struct Prueba *encontrada = buscarPrueba(lista, p->id);
+                if (encontrada) printf("Prueba encontrada: %d\n", encontrada->id);
+
+                eliminarPrueba(&lista, p);
+                printf("Prueba eliminada.\n");
+                break;
+            }
+            case 2: {
+                // Implicados
+                struct Persona *imp = crearImplicado(NULL);
+                inputCrearImplicado(imp);
+                mostrarImplicado(imp);
+
+                struct NodoPersona *lista = NULL;
+                agregarImplicado(&lista, crearNodoImplicado(imp));
+                mostrarListaImplicados(lista);
+
+                struct Persona *buscado = buscarImplicado(lista, imp->rut);
+                if (buscado) printf("Implicado encontrado: %s\n", buscado->nombre);
+
+                // eliminarImplicado(&lista, imp->rut); // Implementar si es necesario
+                break;
+            }
+            case 3: {
+                // Fiscales
+                struct Persona *fiscal = crearFiscal();
+                inputCrearImplicado(fiscal);
+                mostrarFiscal(fiscal);
+
+                struct NodoPersona *lista = NULL;
+                agregarFiscal(&lista, fiscal);
+                mostrarListaFiscales(lista);
+
+                struct Persona *buscado = buscarFiscal(lista, fiscal->rut);
+                if (buscado) printf("Fiscal encontrado: %s\n", buscado->nombre);
+
+                // eliminarFiscal(&lista, fiscal->rut); // Implementar si es necesario
+                break;
+            }
+            case 4: {
+                // Jueces
+                struct Persona **jueces = (struct Persona **)calloc(maxJueces, sizeof(struct Persona *));
+                struct Persona *juez = crearJuez();
+                inputCrearJuez(juez);
+                agregarJuez(jueces, juez);
+                mostrarListaJueces(jueces);
+
+                struct Persona *buscado = buscarJuez(jueces, juez->rut);
+                if (buscado) printf("Juez encontrado: %s\n", buscado->nombre);
+
+                eliminarJuez(jueces, juez->rut);
+                printf("Juez eliminado.\n");
+                free(jueces);
+                break;
+            }
+            default:
+                printf("Opción no válida.\n");
+        }
+    }
+    
     return 0;
 }
