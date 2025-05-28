@@ -17,6 +17,9 @@
 // Fiscales
 #define maxCasos 100         // casos en los que puede llegar a trabajar un fiscal
 
+// Jueces
+#define maxJueces 100        // jueces que pueden existir en el sistema 
+
 struct Prueba {
     int id;
     int categoria; // 0: declaraciones; 1: informes; 2: grabaciones; 3: documentos; 4: evidencias
@@ -71,7 +74,7 @@ struct NodoSIAU {
 };
 
 struct MinPublico {
-    struct NodoPersona *jueces;     // circular simple
+    struct Persona **jueces;     // Array de jueces
     struct NodoPersona *fiscales;   // circular simple
     struct NodoSIAU *siau;          // árbol
 };
@@ -397,19 +400,17 @@ void mostrarJuez(struct Persona *juez) {
     printf("rut: %s\n", juez->rut);
 }
 
-// circular simple
-void mostrarListaJueces(struct NodoPersona *jueces) { 
-    struct NodoPersona *actual;
-    
-    actual = jueces;
+void mostrarListaJueces(struct Persona **jueces) { 
+    int i;
 
-    do {
-        mostrarJuez(actual->persona);
-        actual = actual->sig;
-    } while (actual != jueces);
+    for (i = 0; i < maxJueces; i++) {
+        if( jueces[i] != NULL) {
+            mostrarJuez(jueces[i]);
+        }
+    }   
 }
 
-struct Persona *crearJuez(struct Persona *fiscal) {
+struct Persona *crearJuez() {
     struct Persona *juez;
     
     juez = (struct Persona *)malloc(sizeof(struct Persona));
@@ -432,58 +433,45 @@ void inputCrearJuez(struct Persona *juez) {
     scanf(" %[^\n]", juez->rut);
 }
 
-// nodo simple
-struct NodoPersona *crearNodoJuez(struct Persona *juez) { 
-    struct NodoPersona *nuevoNodo;
+int agregarJuez(struct Persona **jueces, struct Persona *juez) {
+    int i;
 
-    nuevoNodo = (struct NodoPersona *)malloc(sizeof(struct NodoPersona));
-    
-    nuevoNodo->persona = juez;
-    nuevoNodo->sig = NULL;
+    for (i = 0; i < maxJueces; i++) {
+        if (jueces[i] == NULL) {
+            jueces[i] = juez;
 
-    return nuevoNodo;
-}
-
-// circular simple
-void agregarJuez(struct NodoPersona **jueces, struct Persona *juez) {
-    struct NodoPersona *nuevoNodo;
-    struct NodoPersona *ultimo;
-
-    nuevoNodo = crearNodoJuez(juez);
-    ultimo = *jueces;
-
-    if (*jueces == NULL) {
-        *jueces = nuevoNodo;
-        nuevoNodo->sig = nuevoNodo;
-        return;
-    }
-
-    while (ultimo->sig != *jueces) {
-        ultimo = ultimo->sig;
-    }
-
-    ultimo->sig = nuevoNodo;
-    nuevoNodo->sig = *jueces;
-}
-
-struct Persona *buscarJuez(struct NodoPersona *jueces, char *rut) { // circular simple
-    struct NodoPersona *actual;
-
-    actual = jueces;
-
-    do {
-        if (strcmp(actual->persona->rut, rut) == 0) {
-            return actual->persona;
+            return 1; // Agregado con éxito
         }
+    }
 
-        actual = actual->sig;
-    } while (actual != jueces);
+    return 0; // No se pudo agregar, el array está lleno
+}
+
+struct Persona *buscarJuez(struct Persona **jueces, char *rut) { 
+    int i;
+
+    for (i = 0; i < maxJueces; i++) {
+        if (jueces[i] != NULL && strcmp(jueces[i]->rut, rut) == 0) {
+            return jueces[i];
+        }
+    }
 
     return NULL;
 }
 
-// circular simple
-int eliminarJuez(struct NodoPersona **jueces, char *rut);
+int eliminarJuez(struct Persona **jueces, char *rut){
+    int i;
+
+    for (i = 0; i < maxJueces; i++) {
+        if (jueces[i] != NULL && strcmp(jueces[i]->rut, rut) == 0) {
+            jueces[i] = NULL;
+
+            return 1; // Eliminado con éxito
+        }
+    }
+
+    return 0; // No encontrado
+}
 
 int main() {
 
