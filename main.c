@@ -12,7 +12,7 @@
 #define maxStrNombre 20      // máxima longitud de un nombre
 
 // Casos
-#define maxStrRuc            // máxima longitud de un ruc
+#define maxStrRuc 20         // máxima longitud de un ruc
 
 // Fiscales
 #define maxCasos 100         // casos en los que puede llegar a trabajar un fiscal
@@ -211,15 +211,108 @@ int eliminarPrueba(struct NodoPrueba **pruebas, struct Prueba *prueba) {
 void modificarPrueba(struct Prueba *prueba);
 
 //==========>   CASOS   <==========//
-void mostrarCaso(struct Caso *caso);
-void mostrarArbolCasos(struct NodoSIAU *siau);
-struct Caso *buscarCaso(char *ruc);
-struct Caso *crearCaso();
-void inputCrearCaso(struct Caso *caso);
-void crearNodoCaso(struct Caso *caso);
-void agregarCaso(struct NodoSIAU *siau, struct Caso *caso);
-void modificarCaso(struct Caso *caso);
-int eliminarCaso(struct Caso *caso);
+void mostrarCaso(struct Caso *caso) {
+    printf("ruc: %s\n", caso->ruc);
+    printf("estado: %d\n", caso->estado);
+    printf("medida cautelar: %d\n\n", caso->medidaCautelar);
+}
+
+void mostrarArbolCasos(struct NodoSIAU *siau) {
+    if (siau != NULL) {
+        if (siau->izq != NULL) {
+            mostrarArbolCasos(siau->izq);
+        }
+
+        mostrarCaso(siau->caso);
+
+        if (siau->der != NULL) {
+            mostrarArbolCasos(siau->der);
+        }
+    }
+}
+
+struct Caso *buscarCaso(struct NodoSIAU *siau, char *ruc) {
+    if (siau != NULL) {
+        if (strcmp(siau->caso->ruc, ruc) == 0) {
+            return siau->caso;
+        }
+        if (strcmp(siau->caso->ruc, ruc) > 0) {
+            return buscarCaso(siau->izq, ruc);
+        }
+        return buscarCaso(siau->der, ruc);
+    }
+
+    return NULL;
+}
+
+struct Caso *crearCaso() {
+    struct Caso *caso;
+
+    caso = (struct Caso *)malloc(sizeof(struct Caso));
+
+    caso->estado = -1;
+    caso->fiscal = NULL;
+    caso->implicados = NULL;
+    caso->ruc = (char *)malloc(sizeof(char) * maxStrRuc);
+    caso->categoriasPruebas = NULL;
+    caso->medidaCautelar = -1;
+
+    return caso;
+}
+
+void inputCrearCaso(struct Caso *caso, struct Persona *fiscal) {
+    printf("Ingresar estado del caso: ");
+    scanf("%d", &caso->estado);
+
+    printf("Asignando fiscal");
+    caso->fiscal = fiscal;
+}
+
+struct NodoSIAU *crearNodoCaso(struct Caso *caso) {
+    struct NodoSIAU *nuevo = (struct NodoSIAU *)malloc(sizeof(struct NodoSIAU));
+    nuevo->caso = caso;
+    nuevo->izq = NULL;
+    nuevo->der = NULL;
+    return nuevo;
+}
+
+void agregarCaso(struct NodoSIAU **siau, struct Caso *caso) {
+    if (*siau == NULL) {
+        *siau = crearNodoCaso(caso);
+        return;
+    }
+
+    if (strcmp(caso->ruc, (*siau)->caso->ruc) < 0) {
+        agregarCaso(&(*siau)->izq, caso);
+    } else {
+        agregarCaso(&(*siau)->der, caso);
+    }
+}
+
+void modificarCaso(struct Caso *caso) {
+    int opcion;
+    printf("Modificar caso con RUC: %s\n", caso->ruc);
+    printf("1. Cambiar estado\n");
+    printf("2. Cambiar medida cautelar\n");
+    printf("3. Salir\n");
+    printf("Opción: ");
+    scanf("%d", &opcion);
+
+    switch (opcion) {
+        case 1:
+            printf("Nuevo estado: ");
+            scanf("%d", &caso->estado);
+            break;
+        case 2:
+            printf("Nueva medida cautelar: ");
+            scanf("%d", &caso->medidaCautelar);
+            break;
+        case 3:
+            break;
+        default:
+            printf("No se realizaron cambios.\n");
+    }
+}
 
 //==========>   IMPLICADOS   <==========//
 void mostrarImplicado(struct Persona *implicado) {
