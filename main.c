@@ -404,7 +404,6 @@ void mostrarFiscal(struct Persona *fiscal) {
     printf("rut: %s\n", fiscal->rut);
 }
 
-// circular simple
 void mostrarListaFiscales(struct NodoPersona *fiscales) { 
     struct NodoPersona *actual;
     
@@ -432,7 +431,6 @@ struct Persona *crearFiscal() {
 
 void inputCrearImplicado(struct Persona *fiscal);
 
-// nodo simple
 struct NodoPersona *crearNodoFiscal(struct Persona *fiscal) {
     struct NodoPersona *nuevoNodo;
 
@@ -444,7 +442,6 @@ struct NodoPersona *crearNodoFiscal(struct Persona *fiscal) {
     return nuevoNodo;
 }
 
-// circular simple
 void agregarFiscal(struct NodoPersona **fiscales, struct Persona *fiscal) { 
     struct NodoPersona *nuevoNodo;
     struct NodoPersona *ultimo;
@@ -467,7 +464,6 @@ void agregarFiscal(struct NodoPersona **fiscales, struct Persona *fiscal) {
     nuevoNodo->sig = *fiscales;
 }
 
-// circular simple
 struct Persona *buscarFiscal(struct NodoPersona *fiscales, char *rut) {
     struct NodoPersona *actual;
     
