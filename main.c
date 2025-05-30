@@ -71,7 +71,7 @@ struct NodoSIAU {
 };
 
 struct MinPublico {
-    struct Persona **jueces;     // Array de jueces
+    struct Persona **jueces;        // Array de jueces
     struct NodoPersona *fiscales;   // circular simple
     struct NodoSIAU *siau;          // árbol
 };
