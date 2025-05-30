@@ -42,9 +42,6 @@ struct Persona {
     char *rut;
     char *nombre;
 
-    // ROL IMPLICADO:
-    int medidaCautelar; // 0: no tiene medida cautelar; 1: sí tiene medida cautelar
-
     // ROL FISCAL:
     struct Caso **casos;
 };
