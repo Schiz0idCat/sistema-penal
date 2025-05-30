@@ -484,7 +484,44 @@ struct Persona *buscarFiscal(struct NodoPersona *fiscales, char *rut) {
     return NULL;
 }
 
-int eliminarFiscal(struct NodoPersona **implicados, char *rut);
+int eliminarFiscal(struct NodoPersona **implicados, char *rut) {
+    struct NodoPersona *ultimo;
+    struct NodoPersona *act;
+    struct NodoPersona *ant;
+    
+    if (strcmp((*implicados)->persona->rut, rut) == 0) {
+        if ((*implicados)->sig == *implicados) {
+            *implicados = NULL;
+        }
+        else {
+            ultimo = *implicados;
+
+            while (ultimo->sig != NULL) {
+                ultimo = ultimo->sig;
+            }
+
+            *implicados = (*implicados)->sig;
+            (*implicados)->sig = *implicados;
+        }
+
+        return 1;
+    }
+    
+    act = (*implicados)->sig;
+    ant = *implicados;
+
+    while (act != *implicados) {
+        if (strcmp((*implicados)->persona->rut, rut) == 0) {
+            ant->sig = act->sig;
+            return 1;
+        }
+
+        ant = act;
+        act = act->sig;
+    }
+
+    return 0;
+}
 
 //==========>   Juez   <==========//
 void mostrarJuez(struct Persona *juez) {
