@@ -335,8 +335,6 @@ struct Persona *crearImplicado(struct Persona *fiscal) {
     implicado->rut = (char *)malloc(sizeof(char) * maxStrRut);
     implicado->nombre = (char *)malloc(sizeof(char) * maxStrNombre);
 
-    implicado->medidaCautelar = 0;
-
     return implicado;
 }
 
