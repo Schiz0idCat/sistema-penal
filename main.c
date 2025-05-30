@@ -449,7 +449,7 @@ struct Persona *crearFiscal() {
     return fiscal;
 }
 
-void inputCrearImplicado(struct Persona *fiscal);
+void inputCrearFiscal(struct Persona *fiscal);
 
 struct NodoPersona *crearNodoFiscal(struct Persona *fiscal) {
     struct NodoPersona *nuevoNodo;
