@@ -49,15 +49,6 @@ struct Persona {
     struct Caso **casos;
 };
 
-struct Caso {
-    char *ruc;
-    int estado;                              // 0: activo; 1: archivado
-    int medidaCautelar;                      // 0: sin medida cautelar; 1: con medida cautela
-    struct NodoPrueba **categoriasPruebas;   // array de NodoPrueba (array de listas doblemente enlazadas)
-    struct NodoPersona **implicados;         // array de implicados al caso (array de listas simplemente enlazadas)
-    struct Persona *fiscal;
-};
-
 /* Lista que gestiona personas
  * Consideraciones:
  * - la lista de implicados es simplemente enlazada
@@ -66,6 +57,15 @@ struct Caso {
 struct NodoPersona {
     struct Persona *persona;
     struct NodoPersona *sig;
+};
+
+struct Caso {
+    char *ruc;
+    int estado;                              // 0: activo; 1: archivado
+    int medidaCautelar;                      // 0: sin medida cautelar; 1: con medida cautela
+    struct NodoPrueba **categoriasPruebas;   // array de NodoPrueba (array de listas doblemente enlazadas)
+    struct NodoPersona **implicados;         // array de implicados al caso (array de listas simplemente enlazadas)
+    struct Persona *fiscal;
 };
 
 struct NodoSIAU {
