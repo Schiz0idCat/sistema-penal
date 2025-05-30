@@ -391,7 +391,32 @@ struct Persona *buscarImplicado(struct NodoPersona *implicados, char *rut) {
     return NULL;
 }
 
-int eliminarImplicado(struct NodoPersona **implicados, char *rut);
+int eliminarImplicado(struct NodoPersona **implicados, char *rut) {
+    struct NodoPersona *act;
+    struct NodoPersona *ant;
+
+    act = *implicados;
+    ant = NULL;
+
+    if (strcmp((*implicados)->persona->rut, rut) == 0) {
+        *implicados = (*implicados)->sig;
+
+        return 1;
+    }
+
+    while (act != NULL && strcmp((act)->persona->rut, rut) == 0) {
+        ant = act;
+        act = act->sig;
+    }
+
+    if (act != NULL) {
+        ant->sig = act->sig;
+
+        return 1;
+    }
+
+    return 0;
+}
 
 //==========>   Fiscal   <==========//
 void mostrarFiscal(struct Persona *fiscal) {
