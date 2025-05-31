@@ -555,7 +555,7 @@ void interaccionFiscales(struct NodoPersona **fiscales) {
         scanf("%d", &opcion);
 
         switch (opcion) {
-            case 1: // mostrar lista de fiscales
+            case 1: // mostrar todos
                 if (*fiscales == NULL) {
                     printf("\nNo hay fiscales registrados\n");
                 }
@@ -563,7 +563,7 @@ void interaccionFiscales(struct NodoPersona **fiscales) {
                     mostrarListaFiscales(*fiscales);
                 }
                 break;
-            case 2: // mostrar un solo fiscal
+            case 2: // mostrar uno solo
                 if (*fiscales == NULL) {
                     printf("\nNo hay fiscales registrados\n");
                 }
@@ -581,12 +581,12 @@ void interaccionFiscales(struct NodoPersona **fiscales) {
                     }
                 }
                 break;
-            case 3: // Agregar fiscal
+            case 3: // Agregar
                 fiscal = crearPersona();
                 inputCrearPersona(fiscal);
                 agregarFiscal(fiscales, fiscal);
                 break;
-            case 4: // Eliminar fiscal
+            case 4: // Eliminar eliminar
                 if (*fiscales == NULL) {
                     printf("No hay fiscales regsitrados\n");
                 }
