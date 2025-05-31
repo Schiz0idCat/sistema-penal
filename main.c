@@ -38,12 +38,8 @@ struct NodoPrueba {
  * Jueces
  */
 struct Persona {
-    char *rol;
     char *rut;
     char *nombre;
-
-    // ROL FISCAL:
-    struct Caso **casos;
 };
 
 /* Lista que gestiona personas
@@ -75,6 +71,31 @@ struct MinPublico {
     struct NodoPersona *fiscales;   // circular simple
     struct NodoSIAU *siau;          // árbol
 };
+
+//==========>   GENERAL   <==========//
+struct Persona *crearPersona() {
+    struct Persona *persona;
+    
+    persona = (struct Persona *)malloc(sizeof(struct Persona));
+
+    persona->rut = (char *)malloc(sizeof(char) * maxStrRut);
+    persona->nombre = (char *)malloc(sizeof(char) * maxStrNombre);
+
+    return persona;
+}
+
+void inputCrearPersona(struct Persona *persona) {
+    printf("\nIngrese el nombre de la persona: ");
+    scanf(" %[^\n]", persona->nombre);
+
+    printf("Ingrese el rut de la persona: ");
+    scanf(" %[^\n]", persona->rut);
+}
+
+void mostrarPersona(struct Persona *persona) {
+    printf("\nNombre: %s\n", persona->nombre);
+    printf("Rut: %s\n", persona->rut);
+}
 
 //==========>   PRUEBAS   <==========//
 void mostrarCategoriasPruebas(struct NodoPrueba **pruebas) {
@@ -205,7 +226,31 @@ int eliminarPrueba(struct NodoPrueba **pruebas, struct Prueba *prueba) {
     return 1;
 }
 
-void modificarPrueba(struct Prueba *prueba);
+void modificarPrueba(struct Prueba *prueba) {
+    int opcion;
+
+    printf("Modificar prueba con ID: %d\n", prueba->id);
+    printf("1. Cambiar categoría\n");
+    printf("2. Cambiar data\n");
+    printf("3. Salir\n");
+    printf("Opción: ");
+    scanf("%d", &opcion);
+
+    switch (opcion) {
+        case 1:
+            printf("Nueva categoría: ");
+            scanf("%d", &prueba->categoria);
+            break;
+        case 2:
+            printf("Nueva data: ");
+            scanf(" %[^\n]", prueba->data);
+            break;
+        case 3:
+            break;
+        default:
+            printf("Opción inválida.\n");
+    }
+}
 
 //==========>   CASOS   <==========//
 void mostrarCaso(struct Caso *caso) {
@@ -312,42 +357,12 @@ void modificarCaso(struct Caso *caso) {
 }
 
 //==========>   IMPLICADOS   <==========//
-void mostrarImplicado(struct Persona *implicado) {
-    printf("rol: %s\n", implicado->rol);
-    printf("nombre: %s\n", implicado->nombre);
-    printf("rut: %s\n", implicado->rut);
-}   
-
 void mostrarListaImplicados(struct NodoPersona *implicados) {
     while (implicados != NULL) {
-        mostrarImplicado(implicados->persona);
+        mostrarPersona(implicados->persona);
 
         implicados = implicados->sig;
     }
-}
-
-struct Persona *crearImplicado(struct Persona *fiscal) {
-    struct Persona *implicado;
-    
-    implicado = (struct Persona *)malloc(sizeof(struct Persona));
-
-    implicado->rol = (char *)malloc(sizeof(char) * maxStrRol);
-    implicado->rut = (char *)malloc(sizeof(char) * maxStrRut);
-    implicado->nombre = (char *)malloc(sizeof(char) * maxStrNombre);
-
-    return implicado;
-}
-
-void inputCrearImplicado(struct Persona *persona) {
-    printf("Ingrese el rol de la persona: ");
-    scanf(" %[^\n]", persona->rol);
-
-    printf("Ingrese el nombre de la persona: ");
-    scanf(" %[^\n]", persona->nombre);
-
-    printf("Ingrese el rut de la persona: ");
-    scanf(" %[^\n]", persona->rut);
-
 }
 
 struct NodoPersona *crearNodoImplicado(struct Persona *implicado) {
@@ -404,7 +419,7 @@ int eliminarImplicado(struct NodoPersona **implicados, char *rut) {
         return 1;
     }
 
-    while (act != NULL && strcmp((act)->persona->rut, rut) == 0) {
+    while (act != NULL && strcmp((act)->persona->rut, rut) != 0) {
         ant = act;
         act = act->sig;
     }
@@ -418,38 +433,21 @@ int eliminarImplicado(struct NodoPersona **implicados, char *rut) {
     return 0;
 }
 
-//==========>   Fiscal   <==========//
-void mostrarFiscal(struct Persona *fiscal) {
-    printf("nombre: %s\n", fiscal->nombre);
-    printf("rut: %s\n", fiscal->rut);
+void interaccionCasos() {
+    printf("\ninteractuando con los casos...\n\n");
 }
 
+//==========>   Fiscal   <==========//
 void mostrarListaFiscales(struct NodoPersona *fiscales) { 
     struct NodoPersona *actual;
     
     actual = fiscales;
 
     do {
-        mostrarFiscal(actual->persona);
+        mostrarPersona(actual->persona);
         actual = actual->sig;
     } while (actual != fiscales);
 }
-
-struct Persona *crearFiscal() {
-    struct Persona *fiscal;
-    
-    fiscal = malloc(sizeof(struct Persona));
-
-    fiscal->rol = (char *)malloc(sizeof(char) * maxStrRol);
-    fiscal->rut = (char *)malloc(sizeof(char) * maxStrRut);
-    fiscal->nombre = (char *)malloc(sizeof(char) * maxStrNombre);
-
-    fiscal->casos = (struct Caso **)malloc(sizeof(struct Caso *) * maxCasos);
-
-    return fiscal;
-}
-
-void inputCrearFiscal(struct Persona *fiscal);
 
 struct NodoPersona *crearNodoFiscal(struct Persona *fiscal) {
     struct NodoPersona *nuevoNodo;
@@ -466,8 +464,7 @@ void agregarFiscal(struct NodoPersona **fiscales, struct Persona *fiscal) {
     struct NodoPersona *nuevoNodo;
     struct NodoPersona *ultimo;
     
-    nuevoNodo = crearNodoFiscal(fiscal);
-    
+    nuevoNodo = crearNodoFiscal(fiscal); 
     ultimo = *fiscales;
 
     if (*fiscales == NULL) {
@@ -512,71 +509,116 @@ int eliminarFiscal(struct NodoPersona **implicados, char *rut) {
         else {
             ultimo = *implicados;
 
-            while (ultimo->sig != NULL) {
+            while (ultimo->sig != *implicados) {
                 ultimo = ultimo->sig;
             }
 
             *implicados = (*implicados)->sig;
-            (*implicados)->sig = *implicados;
+            ultimo->sig = *implicados;
         }
 
-        return 1;
+        return 1; // eliminado correctamente
     }
     
     act = (*implicados)->sig;
     ant = *implicados;
 
     while (act != *implicados) {
-        if (strcmp((*implicados)->persona->rut, rut) == 0) {
+        if (strcmp(act->persona->rut, rut) == 0) {
             ant->sig = act->sig;
-            return 1;
+            return 1; // eliminado correctamente
         }
 
-        ant = act;
+        ant = ant->sig;
         act = act->sig;
     }
 
-    return 0;
+    return 0; // eliminado incorrectamente
+}
+
+void interaccionFiscales(struct NodoPersona **fiscales) {
+    int opcion;
+    struct Persona *fiscal;
+    char *rut;
+    
+    fiscal = NULL;
+    rut = (char *)malloc(sizeof(char) * maxStrRut);
+
+    do {
+        printf("\nGESTIÓN DE FISCALES\n");
+        printf("1.- Mostrar Fiscales\n");
+        printf("2.- Mostrar Fiscal\n");
+        printf("3.- Agregar Fiscal\n");
+        printf("4.- Eliminar Fiscal\n");
+        printf("5.- Salir\n");
+        printf("Elija una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1: // mostrar lista de fiscales
+                if (*fiscales == NULL) {
+                    printf("\nNo hay fiscales registrados\n");
+                }
+                else {
+                    mostrarListaFiscales(*fiscales);
+                }
+                break;
+            case 2: // mostrar un solo fiscal
+                if (*fiscales == NULL) {
+                    printf("\nNo hay fiscales registrados\n");
+                }
+                else {
+                    printf("\nIngrese el rut del fiscal a mostrar: ");
+                    scanf(" %[^\n]", rut);
+
+                    fiscal = buscarFiscal(*fiscales, rut);
+
+                    if (fiscal == NULL) {
+                        printf("\nNo hay ningún fiscal con rut: %s\n", rut);
+                    }
+                    else {
+                        mostrarPersona(fiscal);
+                    }
+                }
+                break;
+            case 3: // Agregar fiscal
+                fiscal = crearPersona();
+                inputCrearPersona(fiscal);
+                agregarFiscal(fiscales, fiscal);
+                break;
+            case 4: // Eliminar fiscal
+                if (*fiscales == NULL) {
+                    printf("No hay fiscales regsitrados\n");
+                }
+                else {
+                    printf("\nIngrese el rut del fiscal a eliminar: ");
+                    scanf(" %[^\n]", rut);
+
+                    if (eliminarFiscal(fiscales, rut) == 1) {
+                        printf("\nFiscal eliminado correctamente\n");
+                    } else {
+                        printf("\nNo hay ningún fiscal con rut: %s\n", rut);
+                    }
+                }
+                break;
+            case 5: // salir de la interfaz
+                printf("\nSaliendo de la gestión de fiscales...\n\n");
+                break;
+            default:
+                printf("\nOpción inválida. Intente de nuevo.\n"); 
+        }
+    } while (opcion != 5);
 }
 
 //==========>   Juez   <==========//
-void mostrarJuez(struct Persona *juez) {
-    printf("nombre: %s\n", juez->nombre);
-    printf("rol: %s\n", juez->rol);
-    printf("rut: %s\n", juez->rut);
-}
-
-void mostrarListaJueces(struct Persona **jueces) { 
+void mostrarArregloJueces(struct Persona **jueces) { 
     int i;
 
     for (i = 0; i < maxJueces; i++) {
         if( jueces[i] != NULL) {
-            mostrarJuez(jueces[i]);
+            mostrarPersona(jueces[i]);
         }
     }   
-}
-
-struct Persona *crearJuez() {
-    struct Persona *juez;
-    
-    juez = (struct Persona *)malloc(sizeof(struct Persona));
-
-    juez->rol = (char *)malloc(sizeof(char) * maxStrRol);
-    juez->rut = (char *)malloc(sizeof(char) * maxStrRut);
-    juez->nombre = (char *)malloc(sizeof(char) * maxStrNombre);
-
-    return juez;
-}
-
-void inputCrearJuez(struct Persona *juez) {
-    printf("Ingrese el rol de la persona: ");
-    scanf(" %[^\n]", juez->rol);
-
-    printf("Ingrese el nombre de la persona: ");
-    scanf(" %[^\n]", juez->nombre);
-
-    printf("Ingrese el rut de la persona: ");
-    scanf(" %[^\n]", juez->rut);
 }
 
 int agregarJuez(struct Persona **jueces, struct Persona *juez) {
@@ -619,7 +661,42 @@ int eliminarJuez(struct Persona **jueces, char *rut){
     return 0; // No encontrado
 }
 
+void interaccionJueces() {
+    printf("\ninteractuando con los jueces...\n\n");
+}
+
 int main() {
+    struct NodoPersona *fiscales;
+    int opcion;
+
+    fiscales = NULL;
+
+    do {
+        printf("SISTEMA PENAL\n");
+        printf("1.- Jueces.\n");
+        printf("2.- Fiscales.\n");
+        printf("3.- Casos.\n");
+        printf("4.- salir.\n");
+        printf("Elija una opcion: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1:
+                interaccionJueces();
+                break;
+            case 2:
+                interaccionFiscales(&fiscales);
+                break;
+            case 3:
+                interaccionCasos();
+                break;
+            case 4:
+                printf("\nSaliendo del programa...");
+                break;
+            default:
+                printf("\nPor favor escoja una opción válida.\n\n");
+        }
+    } while (opcion != 4);
 
     return 0;
 }
