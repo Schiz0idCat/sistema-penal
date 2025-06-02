@@ -3,7 +3,7 @@
 #include <string.h>
 
 // Pruebas
-#define maxCategoria 4       // declaraciones, informes, grabaciones, documentos, evidencias
+#define maxCategoria 5       // declaraciones, informes, grabaciones, documentos, evidencias
 #define maxStrData 100       // la información de una prueba almacenada en un string
 
 // Personas
@@ -230,10 +230,10 @@ struct NodoPrueba *buscarNodoPrueba(struct NodoPrueba *pruebas, int id) {
     return NULL;
 }
 
-int eliminarPrueba(struct NodoPrueba **pruebas, struct Prueba *prueba) {
+int eliminarPrueba(struct NodoPrueba **pruebas, int id) {
     struct NodoPrueba *nodoEliminar;
 
-    nodoEliminar = buscarNodoPrueba(*pruebas, prueba->id);
+    nodoEliminar = buscarNodoPrueba(*pruebas, id);
 
     if (nodoEliminar != NULL) {
         if (nodoEliminar->ant == NULL) {
@@ -254,6 +254,87 @@ int eliminarPrueba(struct NodoPrueba **pruebas, struct Prueba *prueba) {
     }
 
     return 1;
+}
+
+void interaccionListaPruebas(struct NodoPrueba **pruebas) {
+    int opcion;
+    struct Prueba *prueba;
+    int id;
+
+    prueba = NULL;
+
+    do {
+        printf("\nGESTIÓN DE PRUEBAS\n");
+        printf("1.- Mostrar Pruebas.\n");
+        printf("2.- Mostrar Prueba.\n");
+        printf("3.- Agregar Prueba\n");
+        printf("4.- Salir\n");
+        printf("Elija una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1: // mostrar todos
+                if (*pruebas == NULL) {
+                    printf("\nNo hay pruebas registrados\n");
+                }
+                else {
+                    mostrarListaPruebas(*pruebas);
+                }
+                break;
+            case 2: // mostrar uno solo
+                if (*pruebas == NULL) {
+                    printf("\nNo hay pruebas registrados\n");
+                }
+                else {
+                    printf("\nIngrese el id de la prueba a mostrar: ");
+                    scanf(" %d", &id);
+
+                    prueba = buscarPrueba(*pruebas, id);
+
+                    if (prueba == NULL) {
+                        printf("\nNo hay ninguna prueba con id: %d\n", id);
+                    }
+                    else {
+                        mostrarPrueba(prueba);
+                    }
+                }
+                break;
+            case 3: // Agregar
+                prueba = crearPrueba();
+                inputCrearPrueba(prueba);
+                agregarPrueba(pruebas, prueba);
+                break;
+            case 4: // salir de la interfaz
+                printf("\nSaliendo de la interfaz...\n");
+                break;
+            default:
+                printf("\nOpción inválida. Intente de nuevo.\n"); 
+        }
+    } while (opcion != 4);
+}
+
+void interaccionCategoriasPruebas(struct NodoPrueba **pruebas) {
+    int opcion;
+
+    do {
+        printf("\nTIPOS DE PRUEBAS:\n");
+        printf("1.- Declaraciones.\n");
+        printf("2.- Informes.\n");
+        printf("3.- Grabaciones.\n");
+        printf("4.- Documentos.\n");
+        printf("4.- Evidencias.\n");
+        printf("5.- Salir\n");
+        printf("Seleccione el tipo de prueba con el que desea interactuar: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 5:
+                printf("Volviendo a la interfaz de casos...\n");
+                break;
+            default:
+                interaccionListaPruebas(&pruebas[opcion - 1]);
+        }
+    } while (opcion != 5);
 }
 
 //==========>   IMPLICADOS   <==========//
@@ -799,7 +880,7 @@ void interaccionJueces(struct Persona **jueces) {
 void mostrarCaso(struct Caso *caso) {
     printf("ruc: %s\n", caso->ruc);
     printf("estado: %d\n", caso->estado);
-    printf("medida cautelar: %d\n\n", caso->medidaCautelar);
+    printf("medida cautelar: %d\n", caso->medidaCautelar);
 }
 
 void mostrarArbolCasos(struct NodoSIAU *siau) {
@@ -839,7 +920,7 @@ struct Caso *crearCaso() {
     caso->fiscal = NULL;
     caso->implicados = (struct NodoPersona **)malloc(sizeof(struct NodoPersona *) * maxImplicados);
     caso->ruc = (char *)malloc(sizeof(char) * maxStrRuc);
-    caso->categoriasPruebas = NULL;
+    caso->categoriasPruebas = (struct NodoPrueba **)malloc(sizeof(struct NodoPrueba *) * maxCategoria);
     caso->medidaCautelar = -1;
 
     return caso;
@@ -948,6 +1029,18 @@ void interaccionCasos(struct NodoSIAU **siau, struct NodoPersona *fiscales) {
                         printf("\nNo se encontró ningún caso con RUC: %s\n", ruc);
                     } else {
                         mostrarCaso(caso);
+
+                        printf("Listado imputados.\n");
+                        mostrarListaImplicados(caso->implicados[0]);
+
+                        printf("Listando víctimas.\n");
+                        mostrarListaImplicados(caso->implicados[1]);
+
+                        printf("Listando testigos.\n");
+                        mostrarListaImplicados(caso->implicados[2]);
+
+                        printf("Listando terceros.\n");
+                        mostrarListaImplicados(caso->implicados[3]);
                     }
                 }
                 break;
