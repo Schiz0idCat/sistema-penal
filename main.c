@@ -20,7 +20,7 @@
 
 struct Prueba {
     int id;
-    int categoria; // 0: declaraciones; 1: informes; 2: grabaciones; 3: documentos; 4: evidencias
+    int visible;   // 0: no visible por implicados; 1: sí visible por implicados
     char *data;
 };
 
@@ -52,7 +52,7 @@ struct NodoPersona {
 
 struct Caso {
     char *ruc;
-    int estado;                              // 0: activo; 1: archivado
+    int estado;                              // 0: archivado; 1: activo
     int medidaCautelar;                      // 0: sin medida cautelar; 1: con medida cautela
     struct NodoPrueba **categoriasPruebas;   // array de NodoPrueba (array de listas doblemente enlazadas)
     struct NodoPersona **implicados;         // array de implicados al caso (array de listas simplemente enlazadas)
@@ -128,17 +128,8 @@ void modificarPersona(struct Persona *persona) {
 }
 
 //==========>   PRUEBAS   <==========//
-void mostrarCategoriasPruebas(struct NodoPrueba **pruebas) {
-    int i;
-
-    for (i = 0; i < maxCategoria; i++) {
-        printf("Categoria %d: %d\n", i + 1, pruebas[i]->prueba->categoria);
-    }
-}
-
 void mostrarPrueba(struct Prueba *prueba){
     printf("id: %d\n", prueba->id);
-    printf("categoria: %d\n", prueba->categoria);
     printf("data: %s\n\n", prueba->data);
 }
 
@@ -156,18 +147,14 @@ struct Prueba *crearPrueba() {
     prueba = (struct Prueba *)malloc(sizeof(struct Prueba));
     
     prueba->id = -1;
-    prueba->categoria = -1;
     prueba->data = (char *)malloc(sizeof(char) * maxStrData);
 
     return prueba;
 }
 
 void inputCrearPrueba(struct Prueba *prueba) {
-    printf("Ingrese el id de la prueba: ");
+    printf("\nIngrese el id de la prueba: ");
     scanf("%d", &prueba->id);
-    
-    printf("Ingrese la categoria de la prueba: ");
-    scanf(" %d", &prueba->categoria);
 
     printf("Ingrese los datos de la prueba: ");
     scanf(" %[^\n]", prueba->data);
@@ -228,32 +215,6 @@ struct NodoPrueba *buscarNodoPrueba(struct NodoPrueba *pruebas, int id) {
     }
 
     return NULL;
-}
-
-int eliminarPrueba(struct NodoPrueba **pruebas, int id) {
-    struct NodoPrueba *nodoEliminar;
-
-    nodoEliminar = buscarNodoPrueba(*pruebas, id);
-
-    if (nodoEliminar != NULL) {
-        if (nodoEliminar->ant == NULL) {
-            *pruebas = (*pruebas)->sig;
-
-            if (*pruebas != NULL) {
-                (*pruebas)->ant = NULL;
-            }
-        }
-        else {
-            nodoEliminar->sig->ant = nodoEliminar->sig;
-        }
-
-        nodoEliminar->sig = NULL;
-        nodoEliminar->ant = NULL;
-
-        return 0;
-    }
-
-    return 1;
 }
 
 void interaccionListaPruebas(struct NodoPrueba **pruebas) {
@@ -389,33 +350,6 @@ struct Persona *buscarImplicado(struct NodoPersona *implicados, char *rut) {
     return NULL;
 }
 
-int eliminarImplicado(struct NodoPersona **implicados, char *rut) {
-    struct NodoPersona *act;
-    struct NodoPersona *ant;
-
-    act = *implicados;
-    ant = NULL;
-
-    if (strcmp((*implicados)->persona->rut, rut) == 0) {
-        *implicados = (*implicados)->sig;
-
-        return 1;
-    }
-
-    while (act != NULL && strcmp((act)->persona->rut, rut) != 0) {
-        ant = act;
-        act = act->sig;
-    }
-
-    if (act != NULL) {
-        ant->sig = act->sig;
-
-        return 1;
-    }
-
-    return 0;
-}
-
 void interaccionListaImplicados(struct NodoPersona **implicados) {
     int opcion;
     struct Persona *implicado;
@@ -426,12 +360,10 @@ void interaccionListaImplicados(struct NodoPersona **implicados) {
 
     do {
         printf("\nGESTIÓN DE IMPLICADOS\n");
-        printf("1.- Mostrar Implicados\n");
-        printf("2.- Mostrar Implicado\n");
-        printf("3.- Agregar Implicado\n");
-        printf("4.- Eliminar Implicado\n");
-        printf("5.- Modificar Implicado\n");
-        printf("6.- Salir\n");
+        printf("1.- Mostrar Implicados.\n");
+        printf("2.- Mostrar Implicado.\n");
+        printf("3.- Agregar Implicado.\n");
+        printf("4.- Salir.\n");
         printf("Elija una opción: ");
         scanf("%d", &opcion);
 
@@ -467,46 +399,13 @@ void interaccionListaImplicados(struct NodoPersona **implicados) {
                 inputCrearPersona(implicado);
                 agregarImplicado(implicados, implicado);
                 break;
-            case 4: // Eliminar eliminar
-                if (*implicados == NULL) {
-                    printf("\nNo hay implicados regsitrados\n");
-                }
-                else {
-                    printf("\nIngrese el rut del implicado a eliminar: ");
-                    scanf(" %[^\n]", rut);
-
-                    if (eliminarImplicado(implicados, rut) == 1) {
-                        printf("\nImplicado eliminado correctamente\n");
-                    } else {
-                        printf("\nNo hay ningún implicado con rut: %s\n", rut);
-                    }
-                }
-                break;
-            case 5: // modificar
-                if (*implicados == NULL) {
-                    printf("\nNo hay implicados registrados\n");
-                }
-                else {
-                    printf("\nIngrese el rut del implicado a modificar: ");
-                    scanf(" %[^\n]", rut);
-
-                    implicado = buscarImplicado(*implicados, rut);
-
-                    if (implicado == NULL) {
-                        printf("\nNo hay ningún implicado con rut: %s\n", rut);
-                    }
-                    else {
-                        modificarPersona(implicado);
-                    }
-                }
-                break;
-            case 6: // salir de la interfaz
+            case 4: // salir de la interfaz
                 printf("\nSaliendo de la interfaz...\n");
                 break;
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n"); 
         }
-    } while (opcion != 6);
+    } while (opcion != 4);
 }
 
 void interaccionCategoriasImplicados(struct NodoPersona **implicados) {
@@ -514,17 +413,17 @@ void interaccionCategoriasImplicados(struct NodoPersona **implicados) {
 
     do {
         printf("\nTIPOS DE IMPLICADOS:\n");
-        printf("1.- Imputados\n");
-        printf("2.- Victimas\n");
-        printf("3.- Testigos\n");
-        printf("4.- Terceros\n");
-        printf("5.- Salir\n");
+        printf("1.- Imputados.\n");
+        printf("2.- Victimas.\n");
+        printf("3.- Testigos.\n");
+        printf("4.- Terceros.\n");
+        printf("5.- Salir.\n");
         printf("Seleccione el tipo de implicado con el que desea interactuar: ");
         scanf("%d", &opcion);
 
         switch (opcion) {
             case 5:
-                printf("Volviendo a las categorías de implicados...\n");
+                printf("\nVolviendo a las categorías de implicados...\n");
                 break;
             default:
                 interaccionListaImplicados(&implicados[opcion - 1]);
@@ -641,12 +540,12 @@ void interaccionFiscales(struct NodoPersona **fiscales) {
 
     do {
         printf("\nGESTIÓN DE FISCALES\n");
-        printf("1.- Mostrar Fiscales\n");
-        printf("2.- Mostrar Fiscal\n");
-        printf("3.- Agregar Fiscal\n");
-        printf("4.- Eliminar Fiscal\n");
-        printf("5.- Modificar Fiscal\n");
-        printf("6.- Salir\n");
+        printf("1.- Mostrar Fiscales.\n");
+        printf("2.- Mostrar Fiscal.\n");
+        printf("3.- Agregar Fiscal.\n");
+        printf("4.- Eliminar Fiscal.\n");
+        printf("5.- Modificar Fiscal.\n");
+        printf("6.- Salir.\n");
         printf("Elija una opción: ");
         scanf("%d", &opcion);
 
@@ -684,7 +583,7 @@ void interaccionFiscales(struct NodoPersona **fiscales) {
                 break;
             case 4: // Eliminar eliminar
                 if (*fiscales == NULL) {
-                    printf("\nNo hay fiscales regsitrados\n");
+                    printf("\nNo hay fiscales registrados\n");
                 }
                 else {
                     printf("\nIngrese el rut del fiscal a eliminar: ");
@@ -791,12 +690,12 @@ void interaccionJueces(struct Persona **jueces) {
 
     do {
         printf("\nGESTIÓN DE JUECES\n");
-        printf("1.- Mostrar Jueces\n");
-        printf("2.- Mostrar Juez\n");
-        printf("3.- Agregar Juez\n");
-        printf("4.- Eliminar Juez\n");
-        printf("5.- Modificar Juez\n");
-        printf("6.- Salir\n");
+        printf("1.- Mostrar Jueces.\n");
+        printf("2.- Mostrar Juez.\n");
+        printf("3.- Agregar Juez.\n");
+        printf("4.- Eliminar Juez.\n");
+        printf("5.- Modificar Juez.\n");
+        printf("6.- Salir.\n");
         printf("Elija una opción: ");
         scanf("%d", &opcion);
 
@@ -836,7 +735,7 @@ void interaccionJueces(struct Persona **jueces) {
                 break;
             case 4: // Eliminar eliminar
                 if (*jueces == NULL) {
-                    printf("\nNo hay jueces regsitrados\n");
+                    printf("\nNo hay jueces registrados\n");
                 }
                 else {
                     printf("\nIngrese el rut del juez a eliminar: ");
@@ -960,9 +859,11 @@ void agregarCaso(struct NodoSIAU **siau, struct Caso *caso) {
 void modificarCaso(struct Caso *caso) {
     int opcion;
     printf("Modificar caso con RUC: %s\n", caso->ruc);
-    printf("1. Cambiar estado\n");
-    printf("2. Cambiar medida cautelar\n");
-    printf("3. Salir\n");
+    printf("1.- Cambiar estado.\n");
+    printf("2.- Cambiar medida cautelar.\n");
+    printf("3.- Interactuar implicados.\n");
+    printf("4.- Interactuar pruebas.\n");
+    printf("5.- Salir\n");
     printf("Opción: ");
     scanf("%d", &opcion);
 
@@ -977,12 +878,18 @@ void modificarCaso(struct Caso *caso) {
                 scanf("%d", &caso->medidaCautelar);
                 break;
             case 3:
+                interaccionCategoriasImplicados(caso->implicados);
+                break;
+            case 4:
+                interaccionCategoriasPruebas(caso->categoriasPruebas);
+                break;
+            case 5:
                 printf("Saliendo de la interfaz\n");
                 break;
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n");
         }
-    } while (opcion != 3);
+    } while (opcion != 5);
 }
 
 void interaccionCasos(struct NodoSIAU **siau, struct NodoPersona *fiscales) {
@@ -999,11 +906,11 @@ void interaccionCasos(struct NodoSIAU **siau, struct NodoPersona *fiscales) {
 
     do {
         printf("\nGESTIÓN DE CASOS\n");
-        printf("1.- Mostrar los casos\n");
-        printf("2.- Mostrar un caso\n");
-        printf("3.- Agregar caso\n");
-        printf("4.- Modificar caso\n");
-        printf("5.- Salir\n");
+        printf("1.- Mostrar los casos.\n");
+        printf("2.- Mostrar un caso.\n");
+        printf("3.- Agregar caso.\n");
+        printf("4.- Modificar caso.\n");
+        printf("5.- Salir.\n");
         printf("Elija una opción: ");
         scanf("%d", &opcion);
 
@@ -1030,16 +937,16 @@ void interaccionCasos(struct NodoSIAU **siau, struct NodoPersona *fiscales) {
                     } else {
                         mostrarCaso(caso);
 
-                        printf("Listado imputados.\n");
+                        printf("\nListando imputados.");
                         mostrarListaImplicados(caso->implicados[0]);
 
-                        printf("Listando víctimas.\n");
+                        printf("\nListando víctimas.");
                         mostrarListaImplicados(caso->implicados[1]);
 
-                        printf("Listando testigos.\n");
+                        printf("\nListando testigos.");
                         mostrarListaImplicados(caso->implicados[2]);
 
-                        printf("Listando terceros.\n");
+                        printf("\nListando terceros.");
                         mostrarListaImplicados(caso->implicados[3]);
                     }
                 }
@@ -1063,6 +970,7 @@ void interaccionCasos(struct NodoSIAU **siau, struct NodoPersona *fiscales) {
                         inputCrearCaso(caso, fiscal);
                         agregarCaso(siau, caso);
                         interaccionCategoriasImplicados(caso->implicados);
+                        interaccionCategoriasPruebas(caso->categoriasPruebas);
                     }
                 }
                 break;
