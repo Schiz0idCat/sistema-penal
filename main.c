@@ -56,7 +56,7 @@ struct Caso {
     int medidaCautelar;                      // 0: sin medida cautelar; 1: con medida cautela
     struct NodoPrueba **categoriasPruebas;   // array de NodoPrueba (array de listas doblemente enlazadas)
     struct NodoPersona **implicados;         // array de implicados al caso (array de listas simplemente enlazadas)
-    struct Persona *fiscal;
+    struct Persona *fiscal;                  // fiscal a cargo del caso
 };
 
 struct NodoSIAU {
@@ -146,7 +146,8 @@ struct Prueba *crearPrueba() {
 
     prueba = (struct Prueba *)malloc(sizeof(struct Prueba));
     
-    prueba->id = -1;
+    prueba->id = -1;       // id inválido por defecto, hasta que se le asigne uno
+    prueba->visible = 0;   // invisible por defecto
     prueba->data = (char *)malloc(sizeof(char) * maxStrData);
 
     return prueba;
@@ -218,9 +219,9 @@ struct NodoPrueba *buscarNodoPrueba(struct NodoPrueba *pruebas, int id) {
 }
 
 void interaccionListaPruebas(struct NodoPrueba **pruebas) {
-    int opcion;
     struct Prueba *prueba;
     int id;
+    int opcion;
 
     prueba = NULL;
 
@@ -351,9 +352,9 @@ struct Persona *buscarImplicado(struct NodoPersona *implicados, char *rut) {
 }
 
 void interaccionListaImplicados(struct NodoPersona **implicados) {
-    int opcion;
     struct Persona *implicado;
     char *rut;
+    int opcion;
 
     implicado = NULL;
     rut = (char *)malloc(sizeof(char) * maxStrRut);
@@ -531,9 +532,9 @@ int eliminarFiscal(struct NodoPersona **implicados, char *rut) {
 }
 
 void interaccionFiscales(struct NodoPersona **fiscales) {
-    int opcion;
     struct Persona *fiscal;
     char *rut;
+    int opcion;
     
     fiscal = NULL;
     rut = (char *)malloc(sizeof(char) * maxStrRut);
@@ -681,9 +682,9 @@ int eliminarJuez(struct Persona **jueces, char *rut){
 }
 
 void interaccionJueces(struct Persona **jueces) {
-    int opcion;
     struct Persona *juez;
     char *rut;
+    int opcion;
     
     juez = NULL;
     rut = (char *)malloc(sizeof(char) * maxStrRut);
@@ -815,12 +816,12 @@ struct Caso *crearCaso() {
 
     caso = (struct Caso *)malloc(sizeof(struct Caso));
 
-    caso->estado = -1;
+    caso->estado = -1; // estado inválido por defecto
     caso->fiscal = NULL;
     caso->implicados = (struct NodoPersona **)malloc(sizeof(struct NodoPersona *) * maxImplicados);
     caso->ruc = (char *)malloc(sizeof(char) * maxStrRuc);
     caso->categoriasPruebas = (struct NodoPrueba **)malloc(sizeof(struct NodoPrueba *) * maxCategoria);
-    caso->medidaCautelar = -1;
+    caso->medidaCautelar = -1; // medida cautelar inválida por defecto
 
     return caso;
 }
@@ -893,11 +894,11 @@ void modificarCaso(struct Caso *caso) {
 }
 
 void interaccionCasos(struct NodoSIAU **siau, struct NodoPersona *fiscales) {
-    int opcion;
     struct Caso *caso;
     struct Persona *fiscal;
     char *ruc;
     char *rut;
+    int opcion;
 
     caso = NULL;
     fiscal = NULL;
