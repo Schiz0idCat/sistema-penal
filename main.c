@@ -686,18 +686,6 @@ struct Prueba *buscarPrueba(struct NodoPrueba *pruebas, int id) {
     return NULL;
 }
 
-struct NodoPrueba *buscarNodoPrueba(struct NodoPrueba *pruebas, int id) {
-    while (pruebas != NULL) {
-        if (pruebas->prueba->id == id) {
-            return pruebas;
-        }
-
-        pruebas = pruebas->sig;
-    }
-
-    return NULL;
-}
-
 int interaccionInputPrueba(struct Prueba *prueba, struct Persona **jueces) {
     int opcion;
     char *responsable;
