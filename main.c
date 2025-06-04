@@ -18,6 +18,9 @@
 // Jueces
 #define maxJueces 100        // jueces que pueden existir en el sistema 
 
+// Extra
+#define maxStrPassword 10    // máximo de caracteres para el input de la contraseña
+
 struct Prueba {
     int id;
     int visible;         // 0: no visible por implicados; 1: sí visible por implicados
@@ -192,6 +195,58 @@ void interaccionListaImplicados(struct NodoPersona **implicados) {
         printf("\nGESTIÓN DE IMPLICADOS\n");
         printf("1.- Mostrar Implicados.\n");
         printf("2.- Mostrar Implicado.\n");
+        printf("3.- Salir.\n");
+        printf("Elija una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1: // mostrar todos
+                if (*implicados == NULL) {
+                    printf("\nNo hay implicados registrados\n");
+                }
+                else {
+                    mostrarListaImplicados(*implicados);
+                }
+                break;
+            case 2: // mostrar uno solo
+                if (*implicados == NULL) {
+                    printf("\nNo hay implicados registrados\n");
+                }
+                else {
+                    printf("\nIngrese el rut del implicado a mostrar: ");
+                    scanf(" %[^\n]", rut);
+
+                    implicado = buscarImplicado(*implicados, rut);
+
+                    if (implicado == NULL) {
+                        printf("\nNo hay ningún implicado con rut: %s\n", rut);
+                    }
+                    else {
+                        mostrarPersona(implicado);
+                    }
+                }
+                break;
+            case 3: // salir de la interfaz
+                printf("\nSaliendo de la interfaz...\n");
+                break;
+            default:
+                printf("\nOpción inválida. Intente de nuevo.\n"); 
+        }
+    } while (opcion != 3);
+}
+
+void interaccionListaImplicadosSudo(struct NodoPersona **implicados) {
+    struct Persona *implicado;
+    char *rut;
+    int opcion;
+
+    implicado = NULL;
+    rut = (char *)malloc(sizeof(char) * maxStrRut);
+
+    do {
+        printf("\nGESTIÓN DE IMPLICADOS\n");
+        printf("1.- Mostrar Implicados.\n");
+        printf("2.- Mostrar Implicado.\n");
         printf("3.- Agregar Implicado.\n");
         printf("4.- Salir.\n");
         printf("Elija una opción: ");
@@ -238,7 +293,7 @@ void interaccionListaImplicados(struct NodoPersona **implicados) {
     } while (opcion != 4);
 }
 
-void interaccionCategoriasImplicados(struct NodoPersona **implicados) {
+void interaccionCategoriasImplicados(struct NodoPersona **implicados, int sudo) {
     int opcion;
 
     do {
@@ -256,7 +311,12 @@ void interaccionCategoriasImplicados(struct NodoPersona **implicados) {
                 printf("\nSaliendo de la interfaz...\n");
                 break;
             default:
-                interaccionListaImplicados(&implicados[opcion - 1]);
+                if (sudo == 1) {
+                    interaccionListaImplicadosSudo(&implicados[opcion - 1]);
+                }
+                else {
+                    interaccionListaImplicados(&implicados[opcion - 1]);
+                } 
         }
     } while (opcion != 5);
 }
@@ -361,6 +421,58 @@ int eliminarFiscal(struct NodoPersona **implicados, char *rut) {
 }
 
 void interaccionFiscales(struct NodoPersona **fiscales) {
+    struct Persona *fiscal;
+    char *rut;
+    int opcion;
+    
+    fiscal = NULL;
+    rut = (char *)malloc(sizeof(char) * maxStrRut);
+
+    do {
+        printf("\nGESTIÓN DE FISCALES\n");
+        printf("1.- Mostrar Fiscales.\n");
+        printf("2.- Mostrar Fiscal.\n");
+        printf("3.- Salir.\n");
+        printf("Elija una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1: // mostrar todos
+                if (*fiscales == NULL) {
+                    printf("\nNo hay fiscales registrados\n");
+                }
+                else {
+                    mostrarListaFiscales(*fiscales);
+                }
+                break;
+            case 2: // mostrar uno solo
+                if (*fiscales == NULL) {
+                    printf("\nNo hay fiscales registrados\n");
+                }
+                else {
+                    printf("\nIngrese el rut del fiscal a mostrar: ");
+                    scanf(" %[^\n]", rut);
+
+                    fiscal = buscarFiscal(*fiscales, rut);
+
+                    if (fiscal == NULL) {
+                        printf("\nNo hay ningún fiscal con rut: %s\n", rut);
+                    }
+                    else {
+                        mostrarPersona(fiscal);
+                    }
+                }
+                break;
+            case 3: // salir de la interfaz
+                printf("\nSaliendo de la interfaz...\n\n");
+                break;
+            default:
+                printf("\nOpción inválida. Intente de nuevo.\n"); 
+        }
+    } while (opcion != 3);
+}
+
+void interaccionFiscalesSudo(struct NodoPersona **fiscales) {
     struct Persona *fiscal;
     char *rut;
     int opcion;
@@ -522,6 +634,60 @@ void interaccionJueces(struct Persona **jueces) {
         printf("\nGESTIÓN DE JUECES\n");
         printf("1.- Mostrar Jueces.\n");
         printf("2.- Mostrar Juez.\n");
+        printf("3.- Salir.\n");
+        printf("Elija una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1: // mostrar todos
+                if (*jueces == NULL) {
+                    printf("\nNo hay jueces registrados\n");
+                }
+                else {
+                    if (mostrarArregloJueces(jueces) == 0) {
+                        printf("\nNo hay jueces registrados\n");
+                    }
+                }
+                break;
+            case 2: // mostrar uno solo
+                if (*jueces == NULL) {
+                    printf("\nNo hay jueces registrados\n");
+                }
+                else {
+                    printf("\nIngrese el rut del juez a mostrar: ");
+                    scanf(" %[^\n]", rut);
+
+                    juez = buscarJuez(jueces, rut);
+
+                    if (juez == NULL) {
+                        printf("\nNo hay ningún juez con rut: %s\n", rut);
+                    }
+                    else {
+                        mostrarPersona(juez);
+                    }
+                }
+                break;
+            case 3: // salir de la interfaz
+                printf("\nSaliendo de la interfaz...\n\n");
+                break;
+            default:
+                printf("\nOpción inválida. Intente de nuevo.\n"); 
+        }
+    } while (opcion != 3);
+}
+
+void interaccionJuecesSudo(struct Persona **jueces) {
+    struct Persona *juez;
+    char *rut;
+    int opcion;
+    
+    juez = NULL;
+    rut = (char *)malloc(sizeof(char) * maxStrRut);
+
+    do {
+        printf("\nGESTIÓN DE JUECES\n");
+        printf("1.- Mostrar Jueces.\n");
+        printf("2.- Mostrar Juez.\n");
         printf("3.- Agregar Juez.\n");
         printf("4.- Eliminar Juez.\n");
         printf("5.- Modificar Juez.\n");
@@ -606,15 +772,17 @@ void interaccionJueces(struct Persona **jueces) {
 }
 
 //==========>   PRUEBAS   <==========//
-void mostrarPrueba(struct Prueba *prueba){
-    printf("\nid: %d\n", prueba->id);
-    printf("data: %s\n", prueba->data);
-    printf("responsable: %s\n", prueba->responsable);
+void mostrarPrueba(struct Prueba *prueba, int sudo){
+    if (sudo == 1 || prueba->visible == 1) {
+        printf("\nid: %d\n", prueba->id);
+        printf("data: %s\n", prueba->data);
+        printf("responsable: %s\n", prueba->responsable);
+    }
 }
 
-void mostrarListaPruebas(struct NodoPrueba *pruebas) {
+void mostrarListaPruebas(struct NodoPrueba *pruebas, int sudo) {
     while (pruebas != NULL) {
-        mostrarPrueba(pruebas->prueba);
+        mostrarPrueba(pruebas->prueba, sudo);
 
         pruebas = pruebas->sig;
     }
@@ -747,8 +915,7 @@ void interaccionListaPruebas(struct NodoPrueba **pruebas, struct Persona **juece
         printf("\nGESTIÓN DE PRUEBAS\n");
         printf("1.- Mostrar Pruebas.\n");
         printf("2.- Mostrar Prueba.\n");
-        printf("3.- Agregar Prueba.\n");
-        printf("4.- Salir.\n");
+        printf("3.- Salir.\n");
         printf("Elija una opción: ");
         scanf("%d", &opcion);
 
@@ -758,7 +925,7 @@ void interaccionListaPruebas(struct NodoPrueba **pruebas, struct Persona **juece
                     printf("\nNo hay pruebas registrados\n");
                 }
                 else {
-                    mostrarListaPruebas(*pruebas);
+                    mostrarListaPruebas(*pruebas, 0);
                 }
                 break;
             case 2: // mostrar uno solo
@@ -775,7 +942,59 @@ void interaccionListaPruebas(struct NodoPrueba **pruebas, struct Persona **juece
                         printf("\nNo hay ninguna prueba con id: %d\n", id);
                     }
                     else {
-                        mostrarPrueba(prueba);
+                        mostrarPrueba(prueba, 0);
+                    }
+                }
+                break;
+            case 3: // salir de la interfaz
+                printf("\nSaliendo de la interfaz...\n");
+                break;
+            default:
+                printf("\nOpción inválida. Intente de nuevo.\n"); 
+        }
+    } while (opcion != 3);
+}
+
+void interaccionListaPruebasSudo(struct NodoPrueba **pruebas, struct Persona **jueces) {
+    struct Prueba *prueba;
+    int id;
+    int opcion;
+
+    prueba = NULL;
+
+    do {
+        printf("\nGESTIÓN DE PRUEBAS\n");
+        printf("1.- Mostrar Pruebas.\n");
+        printf("2.- Mostrar Prueba.\n");
+        printf("3.- Agregar Prueba.\n");
+        printf("4.- Salir.\n");
+        printf("Elija una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1: // mostrar todos
+                if (*pruebas == NULL) {
+                    printf("\nNo hay pruebas registrados\n");
+                }
+                else {
+                    mostrarListaPruebas(*pruebas, 1);
+                }
+                break;
+            case 2: // mostrar uno solo
+                if (*pruebas == NULL) {
+                    printf("\nNo hay pruebas registrados\n");
+                }
+                else {
+                    printf("\nIngrese el id de la prueba a mostrar: ");
+                    scanf(" %d", &id);
+
+                    prueba = buscarPrueba(*pruebas, id);
+
+                    if (prueba == NULL) {
+                        printf("\nNo hay ninguna prueba con id: %d\n", id);
+                    }
+                    else {
+                        mostrarPrueba(prueba, 1);
                     }
                 }
                 break;
@@ -795,7 +1014,7 @@ void interaccionListaPruebas(struct NodoPrueba **pruebas, struct Persona **juece
     } while (opcion != 4);
 }
 
-void interaccionCategoriasPruebas(struct NodoPrueba **pruebas, struct Persona **jueces) {
+void interaccionCategoriasPruebas(struct NodoPrueba **pruebas, struct Persona **jueces, int sudo) {
     int opcion;
 
     do {
@@ -814,7 +1033,12 @@ void interaccionCategoriasPruebas(struct NodoPrueba **pruebas, struct Persona **
                 printf("Volviendo a la interfaz de casos...\n");
                 break;
             default:
-                interaccionListaPruebas(&pruebas[opcion - 1], jueces);
+                if (sudo == 1) {
+                    interaccionListaPruebasSudo(&pruebas[opcion - 1], jueces);
+                }
+                else {
+                    interaccionListaPruebas(&pruebas[opcion - 1], jueces);
+                }
         }
     } while (opcion != 5);
 }
@@ -900,7 +1124,7 @@ void agregarCaso(struct NodoSIAU **siau, struct Caso *caso) {
     }
 }
 
-void modificarCaso(struct Caso *caso, struct Persona **jueces) {
+void modificarCaso(struct Caso *caso, struct Persona **jueces, int sudo) {
     int opcion;
     printf("Modificar caso con RUC: %s\n", caso->ruc);
     printf("1.- Cambiar estado.\n");
@@ -922,10 +1146,10 @@ void modificarCaso(struct Caso *caso, struct Persona **jueces) {
                 scanf("%d", &caso->medidaCautelar);
                 break;
             case 3:
-                interaccionCategoriasImplicados(caso->implicados);
+                interaccionCategoriasImplicados(caso->implicados, sudo);
                 break;
             case 4:
-                interaccionCategoriasPruebas(caso->categoriasPruebas, jueces);
+                interaccionCategoriasPruebas(caso->categoriasPruebas, jueces, sudo);
                 break;
             case 5:
                 printf("Saliendo de la interfaz\n");
@@ -937,6 +1161,87 @@ void modificarCaso(struct Caso *caso, struct Persona **jueces) {
 }
 
 void interaccionCasos(struct NodoSIAU **siau, struct NodoPersona *fiscales, struct Persona **jueces) {
+    struct Caso *caso;
+    struct Persona *fiscal;
+    char *ruc;
+    char *rut;
+    int opcion;
+
+    caso = NULL;
+    fiscal = NULL;
+    ruc = (char *)malloc(sizeof(char) * maxStrRuc);
+    rut = (char *)malloc(sizeof(char) * maxStrRut);
+
+    do {
+        printf("\nGESTIÓN DE CASOS\n");
+        printf("1.- Mostrar los casos.\n");
+        printf("2.- Mostrar un caso.\n");
+        printf("3.- Salir.\n");
+        printf("Elija una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1: // Mostrar todos
+                if (*siau == NULL) {
+                    printf("\nNo hay casos registrados\n");
+                } else {
+                    printf("\nÁrbol de casos:\n");
+                    mostrarArbolCasos(*siau);
+                }
+                break;
+            case 2: // Mostrar uno solo
+                if (*siau == NULL) {
+                    printf("\nNo hay casos registrados\n");
+                } else {
+                    printf("\nIngrese el RUC del caso a buscar: ");
+                    scanf(" %[^\n]", ruc);
+
+                    caso = buscarCaso(*siau, ruc);
+
+                    if (caso == NULL) {
+                        printf("\nNo se encontró ningún caso con RUC: %s\n", ruc);
+                    } else {
+                        mostrarCaso(caso);
+
+                        printf("\nListando imputados.");
+                        mostrarListaImplicados(caso->implicados[0]);
+
+                        printf("\nListando víctimas.");
+                        mostrarListaImplicados(caso->implicados[1]);
+
+                        printf("\nListando testigos.");
+                        mostrarListaImplicados(caso->implicados[2]);
+
+                        printf("\nListando terceros.");
+                        mostrarListaImplicados(caso->implicados[3]);
+
+                        printf("\nListando declaraciones.");
+                        mostrarListaPruebas(caso->categoriasPruebas[0], 0);
+
+                        printf("\nListando informes.");
+                        mostrarListaPruebas(caso->categoriasPruebas[1], 0);
+
+                        printf("\nListando grabaciones.");
+                        mostrarListaPruebas(caso->categoriasPruebas[2], 0);
+
+                        printf("\nListando documentos.");
+                        mostrarListaPruebas(caso->categoriasPruebas[3], 0);
+
+                        printf("\nListando evidencias.");
+                        mostrarListaPruebas(caso->categoriasPruebas[4], 0);
+                    }
+                }
+                break;
+            case 3: // Salir
+                printf("\nSaliendo de la interfaz...\n\n");
+                break;
+            default:
+                printf("\nOpción inválida. Intente de nuevo.\n");
+        }
+    } while (opcion != 3);
+}
+
+void interaccionCasosSudo(struct NodoSIAU **siau, struct NodoPersona *fiscales, struct Persona **jueces) {
     struct Caso *caso;
     struct Persona *fiscal;
     char *ruc;
@@ -994,19 +1299,19 @@ void interaccionCasos(struct NodoSIAU **siau, struct NodoPersona *fiscales, stru
                         mostrarListaImplicados(caso->implicados[3]);
 
                         printf("\nListando declaraciones.");
-                        mostrarListaPruebas(caso->categoriasPruebas[0]);
+                        mostrarListaPruebas(caso->categoriasPruebas[0], 1);
 
                         printf("\nListando informes.");
-                        mostrarListaPruebas(caso->categoriasPruebas[1]);
+                        mostrarListaPruebas(caso->categoriasPruebas[1], 1);
 
                         printf("\nListando grabaciones.");
-                        mostrarListaPruebas(caso->categoriasPruebas[2]);
+                        mostrarListaPruebas(caso->categoriasPruebas[2], 1);
 
                         printf("\nListando documentos.");
-                        mostrarListaPruebas(caso->categoriasPruebas[3]);
+                        mostrarListaPruebas(caso->categoriasPruebas[3], 1);
 
                         printf("\nListando evidencias.");
-                        mostrarListaPruebas(caso->categoriasPruebas[4]);
+                        mostrarListaPruebas(caso->categoriasPruebas[4], 1);
                     }
                 }
                 break;
@@ -1028,8 +1333,8 @@ void interaccionCasos(struct NodoSIAU **siau, struct NodoPersona *fiscales, stru
 
                         inputCrearCaso(caso, fiscal);
                         agregarCaso(siau, caso);
-                        interaccionCategoriasImplicados(caso->implicados);
-                        interaccionCategoriasPruebas(caso->categoriasPruebas, jueces);
+                        interaccionCategoriasImplicados(caso->implicados, 1);
+                        interaccionCategoriasPruebas(caso->categoriasPruebas, jueces, 1);
                     }
                 }
                 break;
@@ -1047,7 +1352,7 @@ void interaccionCasos(struct NodoSIAU **siau, struct NodoPersona *fiscales, stru
                         printf("\nNo hay ningún caso con RUC: %s\n", ruc);
                     }
                     else {
-                        modificarCaso(caso, jueces);
+                        modificarCaso(caso, jueces, 1);
                     }
                 }
                 break;
@@ -1060,15 +1365,40 @@ void interaccionCasos(struct NodoSIAU **siau, struct NodoPersona *fiscales, stru
     } while (opcion != 5);
 }
 
-int main() {
-    struct MinPublico *minPublico;
+void panelSudo(struct MinPublico *minPublico) {
     int opcion;
+    
+    do {
+        printf("SISTEMA PENAL\n");
+        printf("1.- Jueces.\n");
+        printf("2.- Fiscales.\n");
+        printf("3.- Casos.\n");
+        printf("4.- salir.\n");
+        printf("Elija una opcion: ");
+        scanf("%d", &opcion);
 
-    minPublico = (struct MinPublico *)malloc(sizeof(struct MinPublico));
-    minPublico->fiscales = NULL;
-    minPublico->siau = NULL;
-    minPublico->jueces = (struct Persona **)malloc(sizeof(struct Persona *) * maxJueces);
+        switch (opcion) {
+            case 1:
+                interaccionJuecesSudo(minPublico->jueces);
+                break;
+            case 2:
+                interaccionFiscalesSudo(&minPublico->fiscales);
+                break;
+            case 3:
+                interaccionCasosSudo(&minPublico->siau, minPublico->fiscales, minPublico->jueces);
+                break;
+            case 4:
+                printf("\nSaliendo del programa...");
+                break;
+            default:
+                printf("\nPor favor escoja una opción válida.\n\n");
+        }
+    } while (opcion != 4);
+}
 
+void panel(struct MinPublico *minPublico) {
+    int opcion;
+    
     do {
         printf("SISTEMA PENAL\n");
         printf("1.- Jueces.\n");
@@ -1095,6 +1425,53 @@ int main() {
                 printf("\nPor favor escoja una opción válida.\n\n");
         }
     } while (opcion != 4);
+}
+
+int main() {
+    struct MinPublico *minPublico;
+    int sudo;
+    int opcion;
+    char *password;
+    char *input;
+
+    minPublico = (struct MinPublico *)malloc(sizeof(struct MinPublico));
+    minPublico->fiscales = NULL;
+    minPublico->siau = NULL;
+    minPublico->jueces = (struct Persona **)malloc(sizeof(struct Persona *) * maxJueces);
+
+    password = "BitBridge";
+    input = (char *)malloc(sizeof(char) * maxStrPassword);
+
+    do {
+        printf("Inicio de sesión sistema penal.\n");
+        printf("1.- Administrador.\n");
+        printf("2.- Usuario.\n");
+        printf("3.- Salir.\n");
+        printf("Escoja una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1:
+                printf("Ingrese contraseña: ");
+                scanf(" %[^\n]", input);
+
+                if (strcmp(input, password) != 0) {
+                    printf("Contraseña incorrecta\n");
+                }
+                else {
+                    panelSudo(minPublico);
+                }
+                break;
+            case 2:
+                panel(minPublico);
+                break;
+            case 3:
+                printf("Saliendo del programa...\n");
+                break;
+            default:
+                printf("\nOpción inválida. Intente de nuevo.\n");
+        }
+    } while (opcion != 3);
 
     return 0;
 }
