@@ -190,8 +190,6 @@ struct Persona *buscarImplicadoLista(struct NodoPersona *implicados, char *rut) 
 struct Persona* buscarImplicadoArbol(struct NodoSIAU *siau, char *rut) {
     struct Caso *caso;
     struct Persona *implicado;
-    struct Persona *encontradoIzq;
-    struct Persona *encontradoDer;
     struct NodoPersona *nodo;
 
     caso = siau->caso;
@@ -206,13 +204,13 @@ struct Persona* buscarImplicadoArbol(struct NodoSIAU *siau, char *rut) {
         }
     }
 
-    encontradoIzq = buscarImplicadoArbol(siau->izq, rut);
-    if (encontradoIzq != NULL) {
-        return encontradoIzq;
+    implicado = buscarImplicadoArbol(siau->izq, rut);
+    if (implicado != NULL) {
+        return implicado;
     }
 
-    encontradoDer = buscarImplicadoArbol(siau->der, rut);
-    return encontradoDer;
+    implicado = buscarImplicadoArbol(siau->der, rut);
+    return implicado;
 }
 
 void mostrarImplicadoArbol(struct NodoSIAU *siau, const char *rutImplicado) {
