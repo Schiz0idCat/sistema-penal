@@ -214,18 +214,21 @@ struct Persona* buscarImplicadoArbol(struct NodoSIAU *siau, char *rut) {
 }
 
 void mostrarImplicadoArbol(struct NodoSIAU *siau, const char *rutImplicado) {
-    struct Caso *caso = siau->caso;
+    struct Caso *caso;
+    struct NodoPersona *lista;
+
+    caso = siau->caso;
 
     for (int i = 0; caso->implicados[i] != NULL; i++) {
-        struct NodoPersona *nodo = caso->implicados[i];
+        lista = caso->implicados[i];
 
-        while (nodo != NULL) {
-            if (strcmp(nodo->persona->rut, rutImplicado) == 0) {
+        while (lista != NULL) {
+            if (strcmp(lista->persona->rut, rutImplicado) == 0) {
                 printf("El implicado %s aparece en el caso: %s\n", rutImplicado, caso->descripcion);
                 break;
             }
 
-            nodo = nodo->sig;
+            lista = lista->sig;
         }
     }
 
@@ -233,7 +236,7 @@ void mostrarImplicadoArbol(struct NodoSIAU *siau, const char *rutImplicado) {
     mostrarImplicadoArbol(siau->der, rutImplicado);
 }
 
-void interaccionListaImplicados(struct NodoPersona **implicados) {
+void interaccionListaImplicados(struct NodoPersona *implicados) {
     struct Persona *implicado;
     char *rut;
     int opcion;
@@ -251,22 +254,22 @@ void interaccionListaImplicados(struct NodoPersona **implicados) {
 
         switch (opcion) {
             case 1: // mostrar todos
-                if (*implicados == NULL) {
+                if (implicados == NULL) {
                     printf("\nNo hay implicados registrados\n");
                 }
                 else {
-                    mostrarListaImplicados(*implicados);
+                    mostrarListaImplicados(implicados);
                 }
                 break;
             case 2: // mostrar uno solo
-                if (*implicados == NULL) {
+                if (implicados == NULL) {
                     printf("\nNo hay implicados registrados\n");
                 }
                 else {
                     printf("\nIngrese el rut del implicado a mostrar: ");
                     scanf(" %[^\n]", rut);
 
-                    implicado = buscarImplicadoLista(*implicados, rut);
+                    implicado = buscarImplicadoLista(implicados, rut);
 
                     if (implicado == NULL) {
                         printf("\nNo hay ningún implicado con rut: %s\n", rut);
@@ -356,17 +359,22 @@ void interaccionCategoriasImplicados(struct NodoPersona **implicados, int sudo) 
         printf("Elija una opción: ");
         scanf("%d", &opcion);
 
-        switch (opcion) {
-            case 5:
-                printf("\nSaliendo de la interfaz...\n");
-                break;
-            default:
-                if (sudo == 1) {
-                    interaccionListaImplicadosSudo(&implicados[opcion - 1]);
-                }
-                else {
-                    interaccionListaImplicados(&implicados[opcion - 1]);
-                } 
+        if (opcion < 1 || opcion > 5) {
+            printf("\nOpción inválida. Intente de nuevo.\n");
+        } else {
+            switch (opcion) {
+                case 5:
+                    printf("\nSaliendo de la interfaz...\n");
+                    break;
+                default:
+                    if (sudo == 1) {
+                        interaccionListaImplicadosSudo(&implicados[opcion - 1]);
+                    }
+                    else {
+                        interaccionListaImplicados(implicados[opcion - 1]);
+                    }
+                    break;
+            }
         }
     } while (opcion != 5);
 }
