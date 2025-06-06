@@ -57,14 +57,14 @@ struct NodoPrueba {
 };
 
 struct Caso {
-    char *ruc;
-    char *descripcion;
-    char *fecha;
+    struct Persona *fiscal;                  // fiscal a cargo del caso
+    struct NodoPersona **implicados;         // array de implicados al caso (array de listas simplemente enlazadas)
+    struct NodoPrueba **categoriasPruebas;   // array de NodoPrueba (array de listas doblemente enlazadas)
+    char *ruc;                               // identificador único
+    char *descripcion;                       // descripción del caso
+    char *fecha;                             // fecha de creación del caso
     int estado;                              // 0: archivado; 1: en juicio; 2: en investigación; 3: cerrado
     int medidaCautelar;                      // 0: sin medida cautelar; 1: con medida cautela
-    struct NodoPrueba **categoriasPruebas;   // array de NodoPrueba (array de listas doblemente enlazadas)
-    struct NodoPersona **implicados;         // array de implicados al caso (array de listas simplemente enlazadas)
-    struct Persona *fiscal;                  // fiscal a cargo del caso
 };
 
 struct NodoSIAU {
@@ -1178,24 +1178,32 @@ struct Caso *crearCaso() {
 
     caso = (struct Caso *)malloc(sizeof(struct Caso));
 
-    caso->estado = -1; // estado inválido por defecto
     caso->fiscal = NULL;
     caso->implicados = (struct NodoPersona **)malloc(sizeof(struct NodoPersona *) * maxImplicados);
-    caso->ruc = (char *)malloc(sizeof(char) * maxStrRuc);
     caso->categoriasPruebas = (struct NodoPrueba **)malloc(sizeof(struct NodoPrueba *) * maxCategoria);
+    caso->ruc = (char *)malloc(sizeof(char) * maxStrRuc);
+    caso->fecha = (char *)malloc(sizeof(char) * maxStrFecha);
+    caso->descripcion = (char *)malloc(sizeof(char) * maxStrDescripcion);
+    caso->estado = -1; // estado inválido por defecto
     caso->medidaCautelar = -1; // medida cautelar inválida por defecto
 
     return caso;
 }
 
 void inputCrearCaso(struct Caso *caso, struct Persona *fiscal) {
+    caso->fiscal = fiscal;
+
     printf("\nIngrese Ruc: ");
     scanf(" %[^\n]", caso->ruc);
 
+    printf("Ingrese descripción: ");
+    scanf(" %[^\n]", caso->descripcion);
+
+    printf("Ingrese fecha (dd-MM-yyyy)\n");
+    scanf(" %[^\n]", caso->fecha);
+
     printf("Ingresar estado del caso: ");
     scanf("%d", &caso->estado);
-
-    caso->fiscal = fiscal;
 }
 
 struct NodoSIAU *crearNodoCaso(struct Caso *caso) {
