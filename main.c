@@ -191,10 +191,11 @@ struct Persona* buscarImplicadoArbol(struct NodoSIAU *siau, char *rut) {
     struct Caso *caso;
     struct Persona *implicado;
     struct NodoPersona *nodo;
+    int i;
 
     caso = siau->caso;
 
-    for (int i = 0; caso->implicados[i] != NULL; i++) {
+    for (i = 0; caso->implicados[i] != NULL; i++) {
         nodo = caso->implicados[i];
 
         implicado = buscarImplicadoLista(nodo, rut);
@@ -216,10 +217,11 @@ struct Persona* buscarImplicadoArbol(struct NodoSIAU *siau, char *rut) {
 void mostrarImplicadoArbol(struct NodoSIAU *siau, const char *rutImplicado) {
     struct Caso *caso;
     struct NodoPersona *lista;
+    int i;
 
     caso = siau->caso;
 
-    for (int i = 0; caso->implicados[i] != NULL; i++) {
+    for (i = 0; caso->implicados[i] != NULL; i++) {
         lista = caso->implicados[i];
 
         while (lista != NULL) {
@@ -698,7 +700,7 @@ void interaccionJueces(struct Persona **jueces) {
 
         switch (opcion) {
             case 1: // mostrar todos
-                if (*jueces == NULL) {
+                if (jueces == NULL) {
                     printf("\nNo hay jueces registrados\n");
                 }
                 else {
@@ -708,7 +710,7 @@ void interaccionJueces(struct Persona **jueces) {
                 }
                 break;
             case 2: // mostrar uno solo
-                if (*jueces == NULL) {
+                if (jueces == NULL) {
                     printf("\nNo hay jueces registrados\n");
                 }
                 else {
@@ -755,7 +757,7 @@ void interaccionJuecesSudo(struct Persona **jueces) {
 
         switch (opcion) {
             case 1: // mostrar todos
-                if (*jueces == NULL) {
+                if (jueces == NULL) {
                     printf("\nNo hay jueces registrados\n");
                 }
                 else {
@@ -765,7 +767,7 @@ void interaccionJuecesSudo(struct Persona **jueces) {
                 }
                 break;
             case 2: // mostrar uno solo
-                if (*jueces == NULL) {
+                if (jueces == NULL) {
                     printf("\nNo hay jueces registrados\n");
                 }
                 else {
@@ -788,7 +790,7 @@ void interaccionJuecesSudo(struct Persona **jueces) {
                 agregarJuez(jueces, juez);
                 break;
             case 4: // Eliminar eliminar
-                if (*jueces == NULL) {
+                if (jueces == NULL) {
                     printf("\nNo hay jueces registrados\n");
                 }
                 else {
@@ -803,7 +805,7 @@ void interaccionJuecesSudo(struct Persona **jueces) {
                 }
                 break;
             case 5: // modificar
-                if (*jueces == NULL) {
+                if (jueces == NULL) {
                     printf("\nNo hay jueces registrados\n");
                 }
                 else {
@@ -933,7 +935,7 @@ int interaccionInputPrueba(struct Prueba *prueba, struct Persona **jueces) {
 
         switch (opcion) {
             case 1:
-                if (*jueces == NULL) {
+                if (jueces == NULL) {
                     printf("\nNo hay jueces registrados\n");
                     return 1; // no se logra asignar juez
                 }
@@ -957,7 +959,6 @@ int interaccionInputPrueba(struct Prueba *prueba, struct Persona **jueces) {
             case 3:
                 printf("\nSaliendo de la interfaz...\n");
                 return 1; // se sale sin asignar a nadie
-                break;
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n");
         }
@@ -966,7 +967,7 @@ int interaccionInputPrueba(struct Prueba *prueba, struct Persona **jueces) {
     return 0; // se logró agregar un responsable
 }
 
-void interaccionListaPruebas(struct NodoPrueba **pruebas, struct Persona **jueces) {
+void interaccionListaPruebas(struct NodoPrueba **pruebas) {
     struct Prueba *prueba;
     int id;
     int opcion;
@@ -1123,7 +1124,7 @@ void interaccionCategoriasPruebas(struct NodoPrueba **pruebas, struct Persona **
                     interaccionListaPruebasSudo(&pruebas[opcion - 1], jueces);
                 }
                 else {
-                    interaccionListaPruebas(&pruebas[opcion - 1], jueces);
+                    interaccionListaPruebas(&pruebas[opcion - 1]);
                 }
         }
     } while (opcion != 5);
@@ -1263,7 +1264,6 @@ void modificarCaso(struct Caso *caso, struct Persona **jueces, int sudo) {
 }
 
 void interaccionMostrarCasos(struct NodoSIAU *siau) {
-    int estado;
     int opcion;
 
     do {
@@ -1308,15 +1308,11 @@ void interaccionMostrarCasos(struct NodoSIAU *siau) {
 
 void interaccionCasos(struct NodoSIAU *siau) {
     struct Caso *caso;
-    struct Persona *fiscal;
     char *ruc;
-    char *rut;
     int opcion;
 
     caso = NULL;
-    fiscal = NULL;
     ruc = (char *)malloc(sizeof(char) * maxStrRuc);
-    rut = (char *)malloc(sizeof(char) * maxStrRut);
 
     do {
         printf("\nGESTIÓN DE CASOS\n");
@@ -1592,7 +1588,6 @@ void panel(struct MinPublico *minPublico) {
 
 int main() {
     struct MinPublico *minPublico;
-    int sudo;
     int opcion;
     char *password;
     char *input;
