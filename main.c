@@ -11,9 +11,9 @@
 #define maxStrNombre 20        // máxima longitud de un nombre
 
 // Casos
-#define maxStrRuc 20           // máxima longitud de un ruc
 #define maxImplicados 4        // 0: imputado; 1: victima; 2: testigo; 3: tercero
-#define maxStrRol 9            // "imputado" es el str más largo dentro de los roles
+#define maxStrRuc 20           // máxima longitud de un ruc
+#define maxDiligencias 100     // máxima cantidad de diligencias por caso
 #define maxStrDescripcion 50   // longitud máxima de la descripción del caso
 #define maxStrFecha 10         // "01-01-1900" 10 caracteres en total
 
@@ -56,10 +56,20 @@ struct NodoPrueba {
     struct NodoPrueba *sig, *ant;
 };
 
+struct Diligencia {
+    struct Persona *juez;   // juez que permitió la Diligencia
+    int id;                 // identificador de la diligencia
+    int gravedad;           // escala del 1-5 (menos importante a más importante)
+    int resolucion;         // 0: rechazada; 1: pendiente; 2: aceptada
+    char *descripcion;      // descripción de la diligencia
+};
+
 struct Caso {
     struct Persona *fiscal;                  // fiscal a cargo del caso
     struct NodoPersona **implicados;         // array de implicados al caso (array de listas simplemente enlazadas)
     struct NodoPrueba **categoriasPruebas;   // array de NodoPrueba (array de listas doblemente enlazadas)
+    struct Diligencia **diligencias;         // array de diligencias
+    int *pLibreDiligencia;                   // última posición libre del array compacto de diligencias
     char *ruc;                               // identificador único
     char *descripcion;                       // descripción del caso
     char *fecha;                             // fecha de creación del caso
@@ -1130,6 +1140,191 @@ void interaccionCategoriasPruebas(struct NodoPrueba **pruebas, struct Persona **
     } while (opcion != 5);
 }
 
+//==========>   DILIGENCIAS <==========//
+struct Diligencia *crearDiligencia() {
+    struct Diligencia *diligencia;
+
+    diligencia = (struct Diligencia *)malloc(sizeof(struct Diligencia));
+
+    diligencia->descripcion = (char *)malloc(sizeof(char) * maxStrDescripcion);
+    diligencia->gravedad = -1;    // por defecto inválido, hasta que un trabajador le asigne gravedad
+    diligencia->juez = crearPersona();
+    diligencia->resolucion = 1;   // por defecto en espera
+
+    return diligencia;
+}
+
+void inputCrearDiligencia(struct Diligencia *diligencia) {
+    printf("\nFormulario de diligencias\n");
+
+    printf("Ingrese un id: ");
+    scanf("%d", &diligencia->id);
+
+    printf("Ingrese una descripción: ");
+    scanf(" %s[^\n]", diligencia->descripcion);
+}
+
+void modificarDiligencia(struct Diligencia *diligencia) {
+    printf("\nModifcar Diligencia\n");
+
+    printf("\nIngrese la gravedad: ");
+    scanf("%d", &diligencia->gravedad);
+
+    printf("Ingrese la resolución (actual: %d): ", diligencia->resolucion);
+    scanf("%d", &diligencia->resolucion);
+}
+
+void mostrarDiligencia(struct Diligencia *diligencia) {
+    printf("Diligencia id: %d\n", diligencia->id);
+
+    printf("Descripción:\n");
+    printf("%s\n", diligencia->descripcion);
+
+    printf("Juez a cargo:\n");
+    mostrarPersona(diligencia->juez);
+
+    printf("Gravedad: %d\n", diligencia->gravedad);
+
+    printf("Resolución: %d\n", diligencia->resolucion);
+}
+
+void mostrarArregloDiligencias(struct Diligencia **diligencias) {
+    int i;
+
+    for (i = 0; i < maxDiligencias && diligencias[i] != NULL; i++) {
+        mostrarDiligencia(diligencias[i]);
+    }
+}
+
+int agregarDiligencia(struct Diligencia **diligencias, int *pLibreDiligencia, struct Diligencia *diligencia) {
+    if (*pLibreDiligencia < maxDiligencias) {
+        diligencias[(*pLibreDiligencia)++] = diligencia;
+
+        return 1; // se agrega la diligencia con éxito
+    }
+
+    return 0; // no hay memoria suficiente para más diligencias
+}
+
+struct Diligencia *buscarDiligencia(struct Diligencia **diligencias, int id) {
+    int i;
+
+    for (i = 0; i < maxDiligencias && diligencias[i] != NULL; i++) {
+        if (diligencias[i]->id == id) {
+            return diligencias[i];
+        }
+    }
+
+    return NULL;
+}
+
+int interaccionInputDiligencia(struct Diligencia *diligencia, struct Persona **jueces) {
+    struct Persona *responsable;
+    char *rut;
+    int opcion;
+
+    responsable = NULL;
+    rut = (char *)malloc(sizeof(char) * maxStrRut);
+
+    do {
+        printf("\nGESTION RELLENAR DILIGENCIA\n");
+        printf("¿Quién gestiona la diligencia?\n");
+        printf("1.- Juez de garantía.\n");
+        printf("2.- Entidad externa.\n");
+        printf("3.- Salir.\n");
+        printf("Elija una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1:
+                if (jueces == NULL) {
+                    printf("\nNo hay jueces registrados\n");
+                    return 1; // no se logra asignar juez
+                }
+                else {
+                    printf("\nIngrese el rut del juez: ");
+                    scanf(" %[^\n]", rut);
+
+                    responsable = buscarJuez(jueces, rut);
+
+                    if (responsable == NULL) {
+                        printf("\nNo hay ningún juez con rut: %s\n", rut);
+                        return 1; // no se logra asignar juez
+                    }
+                    else {
+                        diligencia->juez = responsable;
+                    }
+                }
+                break;
+            case 2:
+                printf("Ingrese la entidad responsable: ");
+                scanf(" %[^\n]", diligencia->juez->nombre);
+                break;
+            case 3:
+                printf("\nSaliendo de la interfaz...\n");
+                return 1; // se sale sin asignar a nadie
+            default:
+                printf("\nOpción inválida. Intente de nuevo.\n");
+        }
+    } while (opcion != 1 && opcion != 2 && opcion != 3);
+
+    return 0; // se logró agregar un responsable
+}
+
+void interaccionDiligencia(struct Diligencia **diligencias, int *pLibreDiligencia, struct Persona **jueces) {
+    struct Diligencia *diligencia;
+    int id;
+    int opcion;
+
+    diligencia = NULL;
+
+    do {
+        printf("\nGESTIÓN DE DILIGENCIAS\n");
+        printf("1.- Mostrar diligencias.\n");
+        printf("2.- Mostrar diligencia.\n");
+        printf("3.- Solicitar diligencia.\n");
+        printf("4.- Salir.\n");
+        printf("Ingrese una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1:
+                if (*diligencias == NULL) {
+                    printf("\nNo hay diligencias para mostrar\n");
+                }
+                else {
+                    mostrarArregloDiligencias(diligencias);
+                }
+                break;
+            case 2:
+                printf("\nIngrese el id de la diligencia a mostrar: ");
+                scanf("%d", &id);
+
+                diligencia = buscarDiligencia(diligencias, id);
+
+                if (diligencia == NULL) {
+                    printf("No hay ninguna diligencia con id: %d\n", id);
+                }
+                else {
+                    mostrarDiligencia(diligencia);
+                }
+                break;
+            case 3:
+                diligencia = crearDiligencia();
+                if (interaccionInputDiligencia(diligencia, jueces) == 0) {
+                    inputCrearDiligencia(diligencia);
+                    agregarDiligencia(diligencias, pLibreDiligencia, diligencia);
+                }
+                break;
+            case 4:
+                
+                break;
+            default:
+                printf("Por favor, eliga una opción válida\n");
+        }
+    } while (opcion != 4);
+}
+
 //==========>   CASOS   <==========//
 void mostrarCaso(struct Caso *caso) {
     printf("\nruc: %s\n", caso->ruc);
@@ -1181,6 +1376,9 @@ struct Caso *crearCaso() {
     caso->fiscal = NULL;
     caso->implicados = (struct NodoPersona **)malloc(sizeof(struct NodoPersona *) * maxImplicados);
     caso->categoriasPruebas = (struct NodoPrueba **)malloc(sizeof(struct NodoPrueba *) * maxCategoria);
+    caso->diligencias = (struct Diligencia **)malloc(sizeof(struct Diligencia *) * maxDiligencias);
+    caso->pLibreDiligencia = malloc(sizeof(int));
+    *caso->pLibreDiligencia = 0;
     caso->ruc = (char *)malloc(sizeof(char) * maxStrRuc);
     caso->fecha = (char *)malloc(sizeof(char) * maxStrFecha);
     caso->descripcion = (char *)malloc(sizeof(char) * maxStrDescripcion);
@@ -1314,7 +1512,7 @@ void interaccionMostrarCasos(struct NodoSIAU *siau) {
     } while (opcion != 6);
 }
 
-void interaccionCasos(struct NodoSIAU *siau) {
+void interaccionCasos(struct NodoSIAU *siau, struct Persona **jueces) {
     struct Caso *caso;
     char *ruc;
     int opcion;
@@ -1326,7 +1524,8 @@ void interaccionCasos(struct NodoSIAU *siau) {
         printf("\nGESTIÓN DE CASOS\n");
         printf("1.- Mostrar los casos.\n");
         printf("2.- Mostrar un caso.\n");
-        printf("3.- Salir.\n");
+        printf("3.- Solicitar Diligencia.\n");
+        printf("4.- Salir.\n");
         printf("Elija una opción: ");
         scanf("%d", &opcion);
 
@@ -1382,24 +1581,44 @@ void interaccionCasos(struct NodoSIAU *siau) {
                     }
                 }
                 break;
-            case 3: // Salir
+            case 3: // solicitar diligencia
+                if (siau == NULL) {
+                    printf("\nNo hay casos a los que solicitar una diligencia.\n");
+                }
+                else {
+                    printf("\nIngrese el RUC del caso a buscar: ");
+                    scanf(" %[^\n]", ruc);
+
+                    caso = buscarCasoRuc(siau, ruc);
+
+                    if (caso == NULL) {
+                        printf("\nNo se encontró ningún caso con RUC: %s\n", ruc);
+                    } else {
+                        interaccionDiligencia(caso->diligencias, caso->pLibreDiligencia, jueces);
+                    }
+                }
+                break;
+            case 4: // Salir
                 printf("\nSaliendo de la interfaz...\n\n");
                 break;
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n");
         }
-    } while (opcion != 3);
+    } while (opcion != 4);
 }
 
 void interaccionCasosSudo(struct NodoSIAU **siau, struct NodoPersona *fiscales, struct Persona **jueces) {
     struct Caso *caso;
     struct Persona *fiscal;
+    struct Diligencia *diligencia;
+    int id;
     char *ruc;
     char *rut;
     int opcion;
 
     caso = NULL;
     fiscal = NULL;
+    diligencia = NULL;
     ruc = (char *)malloc(sizeof(char) * maxStrRuc);
     rut = (char *)malloc(sizeof(char) * maxStrRut);
 
@@ -1410,7 +1629,9 @@ void interaccionCasosSudo(struct NodoSIAU **siau, struct NodoPersona *fiscales, 
         printf("3.- Agregar caso.\n");
         printf("4.- Modificar caso.\n");
         printf("5.- Buscar implicado.\n");
-        printf("6.- Salir.\n");
+        printf("6.- Diligencias.\n");
+        printf("7.- Modificar diligencia.\n");
+        printf("8.- Salir.\n");
         printf("Elija una opción: ");
         scanf("%d", &opcion);
 
@@ -1523,13 +1744,57 @@ void interaccionCasosSudo(struct NodoSIAU **siau, struct NodoPersona *fiscales, 
                     }
                 }
                 break;
-            case 6: // Salir
+            case 6: // solicitar diligencia
+                if (*siau == NULL) {
+                    printf("\nNo hay casos a los que solicitar una diligencia.\n");
+                }
+                else {
+                    printf("\nIngrese el RUC del caso a buscar: ");
+                    scanf(" %[^\n]", ruc);
+
+                    caso = buscarCasoRuc(*siau, ruc);
+
+                    if (caso == NULL) {
+                        printf("\nNo se encontró ningún caso con RUC: %s\n", ruc);
+                    } else {
+                        interaccionDiligencia(caso->diligencias, caso->pLibreDiligencia, jueces);
+                    }
+                }
+                break;
+            case 7: // modificar diligencia
+                if (*siau == NULL) {
+                    printf("\nNo hay casos a los que modificar una diligencia.\n");
+                }
+                else {
+                    printf("\nIngrese el RUC del caso a buscar: ");
+                    scanf(" %[^\n]", ruc);
+
+                    caso = buscarCasoRuc(*siau, ruc);
+
+                    if (caso == NULL) {
+                        printf("\nNo se encontró ningún caso con RUC: %s\n", ruc);
+                    } else {
+                        printf("\nIngrese el id de la diligencia a modificar: \n");
+                        scanf("%d", &id);
+                        
+                        diligencia = buscarDiligencia(caso->diligencias, id);
+
+                        if (diligencia == NULL) {
+                            printf("\nNo hay ninguna diligencia con id: %d\n", id);
+                        }
+                        else {
+                            modificarDiligencia(diligencia);
+                        }
+                    }
+                }
+                break;
+            case 8: // Salir
                 printf("\nSaliendo de la interfaz...\n\n");
                 break;
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n");
         }
-    } while (opcion != 6);
+    } while (opcion != 8);
 }
 
 void panelSudo(struct MinPublico *minPublico) {
@@ -1583,7 +1848,7 @@ void panel(struct MinPublico *minPublico) {
                 interaccionFiscales(minPublico->fiscales);
                 break;
             case 3:
-                interaccionCasos(minPublico->siau);
+                interaccionCasos(minPublico->siau, minPublico->jueces);
                 break;
             case 4:
                 printf("\nSaliendo del programa...");
