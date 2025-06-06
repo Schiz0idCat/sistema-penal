@@ -36,7 +36,7 @@ struct Persona {
 /* Lista que gestiona personas
  * Consideraciones:
  * - la lista de implicados es simplemente enlazada
- * - lista de fiscales es circular simplemente enlazada
+ * - la lista de fiscales es circular simplemente enlazada
  */
 struct NodoPersona {
     struct Persona *persona;
