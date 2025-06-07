@@ -73,7 +73,8 @@ struct Caso {
     char *ruc;                               // identificador único
     char *descripcion;                       // descripción del caso
     char *fecha;                             // fecha de creación del caso
-    int estado;                              // 0: archivado; 1: en juicio; 2: en investigación; 3: cerrado (eliminado)
+    int estado;                              // 0: archivado; 1: en juicio; 2: en investigación; 3: cerrado; 4: borrado
+    int sentencia;                           // 0: absolutoria; 1: condenatoria
     int medidaCautelar;                      // 0: sin medida cautelar; 1: con medida cautela
 };
 
@@ -1453,9 +1454,10 @@ struct Caso *crearCaso() {
     caso->pLibreDiligencia = malloc(sizeof(int));
     *caso->pLibreDiligencia = 0;
     caso->ruc = (char *)malloc(sizeof(char) * maxStrRuc);
-    caso->fecha = (char *)malloc(sizeof(char) * maxStrFecha);
     caso->descripcion = (char *)malloc(sizeof(char) * maxStrDescripcion);
+    caso->fecha = (char *)malloc(sizeof(char) * maxStrFecha);
     caso->estado = -1; // estado inválido por defecto
+    caso->sentencia = -1; // sentencia inválida por defecto
     caso->medidaCautelar = -1; // medida cautelar inválida por defecto
 
     return caso;
@@ -1492,19 +1494,92 @@ struct Caso *buscarCasoRuc(struct NodoCaso *siau, char *ruc) {
     return buscarCasoRuc(siau->der, ruc);
 }
 
-// int casosAbiertos(struct nodoSIAU *siau) {
-//
-// }
-//
-// int sentenciasCondenatorias(struct nodoSIAU *siau) {
-//
-// }
+int casosAbiertos(struct NodoCaso *siau) {
+    int total;
+    int izquierda;
+    int derecha;
+
+    total = 0;
+
+    if (siau->caso != NULL && siau->caso->estado != 4) {
+        if (siau->caso->estado == 1 || siau->caso->estado == 2) {
+            total = 1;
+        }
+    }
+
+    izquierda = casosAbiertos(siau->izq);
+    derecha = casosAbiertos(siau->der);
+
+    return total + izquierda + derecha;
+}
+
+int sentenciasCondenatorias(struct NodoCaso *siau) {
+    int total;
+    int izquierda;
+    int derecha;
+
+    total = 0;
+
+    if (siau->caso != NULL && siau->caso->estado != 4) {
+        if (siau->caso->sentencia == 1) {
+            total = 1;
+        }
+    }
+
+    izquierda = sentenciasCondenatorias(siau->izq);
+    derecha = sentenciasCondenatorias(siau->der);
+
+    return total + izquierda + derecha;
+}
+
+int casosArchivados(struct NodoCaso *siau) {
+    int total;
+    int izquierda;
+    int derecha;
+
+    total = 0;
+
+    if (siau->caso != NULL && siau->caso->estado != 4) {
+        if (siau->caso->estado == 0) {
+            total = 1;
+        }
+    }
+
+    izquierda = casosArchivados(siau->izq);
+    derecha = casosArchivados(siau->der);
+
+    return total + izquierda + derecha;
+}
+
+int casosConMedidaCautelar(struct NodoCaso *siau) {
+    int total;
+    int izquierda;
+    int derecha;
+
+    total = 0;
+
+    if (siau->caso != NULL && siau->caso->estado != 4) {
+        if (siau->caso->medidaCautelar == 1) {
+            total = 1;
+        }
+    }
+
+    izquierda = casosConMedidaCautelar(siau->izq);
+    derecha = casosConMedidaCautelar(siau->der);
+
+    return total + izquierda + derecha;
+}
 
 //==========>   FRONTEND   <==========//
 void mostrarCaso(struct Caso *caso) {
-    printf("\nruc: %s\n", caso->ruc);
-    printf("estado: %d\n", caso->estado);
-    printf("medida cautelar: %d\n", caso->medidaCautelar);
+    if (caso->estado != 4) {    
+        printf("Ruc: %s\n", caso->ruc);
+        printf("Descripción: %s\n", caso->descripcion);
+        printf("Fecha: %s\n", caso->fecha);
+        printf("Estado: %d\n", caso->estado);
+        printf("Medida cautelar: %d\n", caso->medidaCautelar);
+        printf("Sentencia: %d\n", caso->sentencia);
+    }
 }
 
 void mostrarArbolCasos(struct NodoCaso *siau) {
@@ -1531,6 +1606,14 @@ void mostrarCasosEstado(struct NodoCaso *siau, int estado) {
     if (siau->der != NULL) {
         mostrarCasosEstado(siau->der, estado);
     }
+}
+
+void mostrarEstadisticas(struct NodoCaso *siau) {
+    printf("Estadísticas de los casos registrados\n");
+    printf("Casos abiertos: %d\n", casosAbiertos(siau));
+    printf("Casos archivados: %d\n", casosArchivados(siau));
+    printf("Casos con medida cautelar: %d\n", casosAbiertos(siau));
+    printf("Sentencias condenatorias: %d\n", sentenciasCondenatorias(siau));
 }
 
 void inputCrearCaso(struct Caso *caso, struct Persona *fiscal) {
@@ -1595,7 +1678,8 @@ void interaccionMostrarCasos(struct NodoCaso *siau) {
         printf("3.- Casos con estado en juicio.\n");
         printf("4.- Casos con estado en investigación.\n");
         printf("5.- Casos con estado cerrado.\n");
-        printf("6.- Salir.\n");
+        printf("6.- Mostrar estadísticas.\n");
+        printf("7.- Salir.\n");
         scanf("%d", &opcion);
 
         switch (opcion) {
@@ -1620,12 +1704,15 @@ void interaccionMostrarCasos(struct NodoCaso *siau) {
                 mostrarCasosEstado(siau, opcion - 2);
                 break;
             case 6:
+                mostrarEstadisticas(siau);
+                break;
+            case 7:
                 printf("Saliendo de la interfaz...\n");
                 break;
             default:
                 printf("Por favor, elija una opción válida.\n");
         }
-    } while (opcion != 6);
+    } while (opcion != 7);
 }
 
 void interaccionCasos(struct NodoCaso *siau, struct Persona **jueces) {
