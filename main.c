@@ -60,7 +60,7 @@ struct Diligencia {
     struct Persona *responsable;   // juez o entidad que permitió la Diligencia
     int id;                        // identificador de la diligencia
     int gravedad;                  // escala del 1-5 (menos importante a más importante)
-    int resolucion;                // 0: rechazada; 1: pendiente; 2: aceptada
+    int estado;                // 0: rechazada (eliminada); 1: pendiente; 2: aceptada
     char *descripcion;             // descripción de la diligencia
 };
 
@@ -1232,7 +1232,7 @@ struct Diligencia *crearDiligencia() {
     diligencia->descripcion = (char *)malloc(sizeof(char) * maxStrDescripcion);
     diligencia->gravedad = -1;    // por defecto inválido, hasta que un trabajador le asigne gravedad
     diligencia->responsable = crearPersona();
-    diligencia->resolucion = 1;   // por defecto en espera
+    diligencia->estado = 1;   // por defecto en espera
 
     return diligencia;
 }
@@ -1270,28 +1270,20 @@ void inputCrearDiligencia(struct Diligencia *diligencia) {
 }
 
 //==========>   FRONTEND   <==========//
-void modificarDiligencia(struct Diligencia *diligencia) {
-    printf("\nModifcar Diligencia\n");
-
-    printf("\nIngrese la gravedad: ");
-    scanf("%d", &diligencia->gravedad);
-
-    printf("Ingrese la resolución (actual: %d): ", diligencia->resolucion);
-    scanf("%d", &diligencia->resolucion);
-}
-
 void mostrarDiligencia(struct Diligencia *diligencia) {
-    printf("Diligencia id: %d\n", diligencia->id);
+    if (diligencia->estado != 0){
+        printf("Diligencia id: %d\n", diligencia->id);
 
-    printf("Descripción:\n");
-    printf("%s\n", diligencia->descripcion);
+        printf("Descripción:\n");
+        printf("%s\n", diligencia->descripcion);
 
-    printf("Juez a cargo:\n");
-    mostrarPersona(diligencia->responsable);
+        printf("Juez a cargo:\n");
+        mostrarPersona(diligencia->responsable);
 
-    printf("Gravedad: %d\n", diligencia->gravedad);
+        printf("Gravedad: %d\n", diligencia->gravedad);
 
-    printf("Resolución: %d\n", diligencia->resolucion);
+        printf("Resolución: %d\n", diligencia->estado);
+    }
 }
 
 void mostrarArregloDiligencias(struct Diligencia **diligencias) {
@@ -1300,6 +1292,39 @@ void mostrarArregloDiligencias(struct Diligencia **diligencias) {
     for (i = 0; i < maxDiligencias && diligencias[i] != NULL; i++) {
         mostrarDiligencia(diligencias[i]);
     }
+}
+
+void modificarDiligencia(struct Diligencia *diligencia) {
+    int opcion;
+
+    do {
+        printf("\nModificar Diligencia\n");
+        mostrarDiligencia(diligencia);
+        printf("1.- Gravedad.\n");
+        printf("2.- Estado.\n");
+        printf("3.- Salir.\n");
+        printf("Eliga una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1:
+                printf("Escala del 1 al 5 (menos grave - más grave): ");
+                scanf("%d", &diligencia->gravedad);
+                break;
+            case 2:
+                printf("0.- Rechazado (eliminar)\n");
+                printf("1.- Pendiente\n");
+                printf("2.- Aceptado\n");
+                printf("Eliga una opción: ");
+                scanf("%d", &diligencia->estado);
+                break;
+            case 3:
+                printf("Saliendo de la modificación de diligencia...\n");
+                break;
+            default:
+                printf("Por favor, eliga una opción válida\n");
+        }
+    } while (opcion != 3);
 }
 
 int interaccionInputDiligencia(struct Diligencia *diligencia, struct Persona **jueces) {
@@ -1401,7 +1426,7 @@ void interaccionDiligencia(struct Diligencia **diligencias, int *pLibreDiligenci
                 }
                 break;
             case 4:
-                
+
                 break;
             default:
                 printf("Por favor, eliga una opción válida\n");
@@ -1867,7 +1892,7 @@ void interaccionCasosSudo(struct NodoCaso **siau, struct NodoPersona *fiscales, 
                     } else {
                         printf("\nIngrese el id de la diligencia a modificar: \n");
                         scanf("%d", &id);
-                        
+
                         diligencia = buscarDiligencia(caso->diligencias, id);
 
                         if (diligencia == NULL) {
