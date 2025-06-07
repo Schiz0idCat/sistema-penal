@@ -45,7 +45,7 @@ struct NodoPersona {
 
 struct Prueba {
     int id;              // id de la prueba
-    int visible;         // 0: no visible por terceros; 1: sí visible por terceros
+    int estado;         // 0: no visible por terceros; 1: sí visible por terceros; 2: prueba inválida (eliminada)
     char *responsable;   // responsable de gestionar la prueba
     char *data;          // data de la prueba
 };
@@ -427,7 +427,7 @@ void interaccionCategoriasImplicados(struct NodoPersona **implicados, int sudo) 
 
 ///////////////////////////////////////////
 ///////////////////////////////////////////
-/////////////    IMPLICADOS   /////////////
+///////////////    FISCAL   ///////////////
 ///////////////////////////////////////////
 ///////////////////////////////////////////
 
@@ -522,7 +522,7 @@ int eliminarFiscal(struct NodoPersona **implicados, char *rut) {
 //==========>   FRONTEND   <==========//
 void mostrarListaFiscales(struct NodoPersona *fiscales) { 
     struct NodoPersona *actual;
-    
+
     actual = fiscales;
 
     do {
@@ -535,7 +535,7 @@ void interaccionFiscales(struct NodoPersona *fiscales) {
     struct Persona *fiscal;
     char *rut;
     int opcion;
-    
+
     fiscal = NULL;
     rut = (char *)malloc(sizeof(char) * maxStrRut);
 
@@ -678,7 +678,7 @@ void interaccionFiscalesSudo(struct NodoPersona **fiscales) {
 
 ///////////////////////////////////////////
 ///////////////////////////////////////////
-/////////////    IMPLICADOS   /////////////
+////////////////    JUEZ   ////////////////
 ///////////////////////////////////////////
 ///////////////////////////////////////////
 
@@ -798,7 +798,7 @@ void interaccionJuecesSudo(struct Persona **jueces) {
     struct Persona *juez;
     char *rut;
     int opcion;
-    
+
     juez = NULL;
     rut = (char *)malloc(sizeof(char) * maxStrRut);
 
@@ -902,7 +902,7 @@ struct Prueba *crearPrueba() {
     prueba = (struct Prueba *)malloc(sizeof(struct Prueba));
     
     prueba->id = -1;       // id inválido por defecto, hasta que se le asigne uno
-    prueba->visible = 0;   // invisible por defecto
+    prueba->estado = 0;   // invisible por defecto
     prueba->data = (char *)malloc(sizeof(char) * maxStrData);
     prueba->responsable = (char *)malloc(sizeof(char) * maxStrNombre);
 
@@ -956,13 +956,13 @@ struct Prueba *buscarPrueba(struct NodoPrueba *pruebas, int id) {
 
 //==========>   FRONTEND   <==========//
 void mostrarPrueba(struct Prueba *prueba, int sudo){
-    if (sudo == 1 || prueba->visible == 1) {
+    if (sudo == 1 && prueba->estado != 2 || prueba->estado == 1) {
         printf("\nid: %d\n", prueba->id);
         printf("data: %s\n", prueba->data);
         printf("responsable: %s\n", prueba->responsable);
 
         if (sudo == 1) {
-            printf("visible: %d\n", prueba->visible);
+            printf("visible: %d\n", prueba->estado);
         }
     }
 }
@@ -983,7 +983,34 @@ void inputCrearPrueba(struct Prueba *prueba) {
     scanf(" %[^\n]", prueba->data);
 }
 
-int interaccionInputPrueba(struct Prueba *prueba, struct Persona **jueces) {
+void modificarPrueba(struct Prueba *prueba) {
+    int opcion;
+
+    do {
+        printf("MODIFICAR PRUEBA.\n");
+        mostrarPrueba(prueba, 1);
+        printf("1.- Estado.\n");
+        printf("2.- Salir.\n");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1:
+                printf("0.- No visible por terceros\n");
+                printf("1.- Sí es visible por terceros\n");
+                printf("2.- Eliminar prueba\n");
+                printf("Ingrese un estado: ");
+                scanf("%d", &prueba->estado);
+                break;
+            case 2:
+                printf("Finalizando la modificación...\n");
+                break;
+            default:
+                printf("Por favor, eliga una opción válida\n");
+        }
+    } while (opcion != 2);
+}
+
+int interaccionResponsablePrueba(struct Prueba *prueba, struct Persona **jueces) {
     int opcion;
     char *responsable;
 
@@ -1095,7 +1122,7 @@ void interaccionListaPruebasSudo(struct NodoPrueba **pruebas, struct Persona **j
         printf("1.- Mostrar Pruebas.\n");
         printf("2.- Mostrar Prueba.\n");
         printf("3.- Agregar Prueba.\n");
-        printf("4.- Cambiar visibilidad.\n");
+        printf("4.- Modificar.\n");
         printf("5.- Salir.\n");
         printf("Elija una opción: ");
         scanf("%d", &opcion);
@@ -1129,12 +1156,12 @@ void interaccionListaPruebasSudo(struct NodoPrueba **pruebas, struct Persona **j
                 break;
             case 3: // Agregar
                 prueba = crearPrueba();
-                if (interaccionInputPrueba(prueba, jueces) == 0){
+                if (interaccionResponsablePrueba(prueba, jueces) == 0){
                     inputCrearPrueba(prueba);
                     agregarPrueba(pruebas, prueba);
                 }
                 break;
-            case 4: 
+            case 4: // modificar
                 if (*pruebas == NULL) {
                     printf("\nNo hay pruebas registrados\n");
                 }
@@ -1148,12 +1175,7 @@ void interaccionListaPruebasSudo(struct NodoPrueba **pruebas, struct Persona **j
                         printf("\nNo hay ninguna prueba con id: %d\n", id);
                     }
                     else {
-                        if (prueba->visible == 0) {
-                            prueba->visible = 1;
-                        }
-                        else {
-                            prueba->visible = 0;
-                        }
+                        modificarPrueba(prueba);
                     }
                 }
                 break;
