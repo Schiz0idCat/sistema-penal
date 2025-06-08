@@ -60,7 +60,7 @@ struct Diligencia {
     struct Persona *responsable;   // juez o entidad que permitió la Diligencia
     int id;                        // identificador de la diligencia
     int gravedad;                  // escala del 1-5 (menos importante a más importante)
-    int estado;                // 0: rechazada (eliminada); 1: pendiente; 2: aceptada
+    int estado;                    // 0: rechazada (eliminada); 1: pendiente; 2: aceptada
     char *descripcion;             // descripción de la diligencia
 };
 
