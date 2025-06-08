@@ -1203,17 +1203,22 @@ void interaccionCategoriasPruebas(struct NodoPrueba **pruebas, struct Persona **
         printf("Elija una opción: ");
         scanf("%d", &opcion);
 
-        switch (opcion) {
-            case 5:
-                printf("Volviendo a la interfaz de casos...\n");
-                break;
-            default:
-                if (sudo == 1) {
-                    interaccionListaPruebasSudo(&pruebas[opcion - 1], jueces);
-                }
-                else {
-                    interaccionListaPruebas(pruebas[opcion - 1]);
-                }
+        if (opcion < 1 || opcion > 5) {
+            printf("Por favor, escoja una opción válida.\n");
+        }
+        else {
+            switch (opcion) {
+                case 5:
+                    printf("Volviendo a la interfaz de casos...\n");
+                    break;
+                default:
+                    if (sudo == 1) {
+                        interaccionListaPruebasSudo(&pruebas[opcion - 1], jueces);
+                    }
+                    else {
+                        interaccionListaPruebas(pruebas[opcion - 1]);
+                    }
+            }
         }
     } while (opcion != 5);
 }
