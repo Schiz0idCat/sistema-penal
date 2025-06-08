@@ -45,7 +45,7 @@ struct NodoPersona {
 
 struct Prueba {
     int id;              // id de la prueba
-    int estado;         // 0: no visible por terceros; 1: sí visible por terceros; 2: prueba inválida (eliminada)
+    int estado;          // 0: no visible por terceros; 1: sí visible por terceros; 2: eliminada
     char *responsable;   // responsable de gestionar la prueba
     char *data;          // data de la prueba
 };
