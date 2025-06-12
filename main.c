@@ -109,23 +109,8 @@ struct Persona *crearPersona() {
 
 //==========>   FRONTEND   <==========//
 void mostrarPersona(struct Persona *persona) {
-    printf("Nombre: ");
-
-    if (persona->nombre != NULL) {
-        printf("%s\n", persona->nombre);
-    }
-    else {
-        printf("NULL\n");
-    }
-
-    printf("Rut: ");
-
-    if (persona->rut != NULL) {
-        printf("%s\n", persona->rut);
-    }
-    else {
-        printf("NULL\n");
-    }
+    printf("Nombre: %s.\n", persona->nombre);
+    printf("Rut: %s.\n", persona->rut);
 }
 
 void inputCrearPersona(struct Persona *persona) {
@@ -134,9 +119,11 @@ void inputCrearPersona(struct Persona *persona) {
     do {
         printf("\nGestión crear persona\n\n");
         mostrarPersona(persona);
-        printf("\n1.- Ingresar nombre.");
-        printf("\n2.- Ingresar rut.\n");
-        printf("\n3.- Salir.\n");
+        printf("\n1.- Ingresar nombre.\n");
+        printf("2.- Ingresar rut.\n");
+        printf("3.- Salir.\n");
+        printf("Ingrese una opcion: ");
+        scanf("%d", &opcion);
 
         switch (opcion) {
             case 1:
