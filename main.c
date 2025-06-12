@@ -113,11 +113,11 @@ void mostrarPersona(struct Persona *persona) {
     printf("Rut: %s.\n", persona->rut);
 }
 
-void inputCrearPersona(struct Persona *persona) {
+void inputPersona(struct Persona *persona) {
     int opcion;
 
     do {
-        printf("\nGestión crear persona\n\n");
+        printf("\nGestión persona\n\n");
         mostrarPersona(persona);
         printf("\n1.- Ingresar nombre.\n");
         printf("2.- Ingresar rut.\n");
@@ -391,7 +391,7 @@ void interaccionListaImplicadosSudo(struct NodoPersona **implicados) {
                 break;
             case 3: // Agregar
                 implicado = crearPersona();
-                inputCrearPersona(implicado);
+                inputPersona(implicado);
                 agregarImplicado(implicados, implicado);
                 break;
             case 4: // modificar
@@ -661,7 +661,7 @@ void interaccionFiscalesSudo(struct NodoPersona **fiscales) {
                 break;
             case 3: // Agregar
                 fiscal = crearPersona();
-                inputCrearPersona(fiscal);
+                inputPersona(fiscal);
                 agregarFiscal(fiscales, fiscal);
                 break;
             case 4: // Eliminar eliminar
@@ -874,7 +874,7 @@ void interaccionJuecesSudo(struct Persona **jueces) {
                 break;
             case 3: // Agregar
                 juez = crearPersona();
-                inputCrearPersona(juez);
+                inputPersona(juez);
                 agregarJuez(jueces, juez);
                 break;
             case 4: // Eliminar eliminar
@@ -1035,7 +1035,7 @@ void modificarPrueba(struct Prueba *prueba) {
                 printf("Finalizando la modificación...\n");
                 break;
             default:
-                printf("Por favor, eliga una opción válida\n");
+                printf("Por favor, elija una opción válida\n");
         }
     } while (opcion != 2);
 }
@@ -1357,7 +1357,7 @@ void modificarDiligencia(struct Diligencia *diligencia) {
                 printf("Saliendo de la modificación de diligencia...\n");
                 break;
             default:
-                printf("Por favor, eliga una opción válida\n");
+                printf("Por favor, elija una opción válida\n");
         }
     } while (opcion != 3);
 }
@@ -1464,7 +1464,7 @@ void interaccionDiligencia(struct Diligencia **diligencias, int *pLibreDiligenci
 
                 break;
             default:
-                printf("Por favor, eliga una opción válida\n");
+                printf("Por favor, elija una opción válida\n");
         }
     } while (opcion != 4);
 }
