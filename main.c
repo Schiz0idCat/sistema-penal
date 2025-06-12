@@ -108,17 +108,55 @@ struct Persona *crearPersona() {
 }
 
 //==========>   FRONTEND   <==========//
-void inputCrearPersona(struct Persona *persona) {
-    printf("Ingrese nombre: ");
-    scanf(" %[^\n]", persona->nombre);
+void mostrarPersona(struct Persona *persona) {
+    printf("Nombre: ");
 
-    printf("Ingrese rut: ");
-    scanf(" %[^\n]", persona->rut);
+    if (persona->nombre != NULL) {
+        printf("%s\n", persona->nombre);
+    }
+    else {
+        printf("NULL\n");
+    }
+
+    printf("Rut: ");
+
+    if (persona->rut != NULL) {
+        printf("%s\n", persona->rut);
+    }
+    else {
+        printf("NULL\n");
+    }
 }
 
-void mostrarPersona(struct Persona *persona) {
-    printf("Nombre: %s\n", persona->nombre);
-    printf("Rut: %s\n", persona->rut);
+void inputCrearPersona(struct Persona *persona) {
+    int opcion;
+
+    do {
+        printf("\nGestión crear persona\n\n");
+        mostrarPersona(persona);
+        printf("\n1.- Ingresar nombre.");
+        printf("\n2.- Ingresar rut.\n");
+        printf("\n3.- Salir.\n");
+
+        switch (opcion) {
+            case 1:
+                printf("Ingrese nombre: ");
+                scanf(" %[^\n]", persona->nombre);
+                break;
+
+            case 2:
+                printf("Ingrese rut: ");
+                scanf(" %[^\n]", persona->rut);
+                break;
+
+            case 3:
+                printf("Saliendo de la creación de la persona...\n");
+                break;
+
+            default:
+                printf("Por favor, elija una opción correcta.\n");
+        }
+    } while (opcion != 3);
 }
 
 void modificarPersona(struct Persona *persona) {
