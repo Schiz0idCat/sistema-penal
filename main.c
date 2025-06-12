@@ -712,7 +712,7 @@ struct Persona *buscarJuez(struct Persona **jueces, char *rut) {
     return NULL;
 }
 
-int eliminarJuez(struct Persona **jueces, char *rut){
+int eliminarJuez(struct Persona **jueces, char *rut) {
     int i;
 
     for (i = 0; i < maxJueces; i++) {
