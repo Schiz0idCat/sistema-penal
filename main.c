@@ -1265,6 +1265,7 @@ struct Diligencia *buscarDiligencia(struct Diligencia **diligencias, int id) {
     return NULL;
 }
 
+//==========>   FRONTEND   <==========//
 void inputCrearDiligencia(struct Diligencia *diligencia) {
     printf("\nFormulario de diligencias\n");
 
@@ -1275,7 +1276,6 @@ void inputCrearDiligencia(struct Diligencia *diligencia) {
     scanf(" %s[^\n]", diligencia->descripcion);
 }
 
-//==========>   FRONTEND   <==========//
 void mostrarDiligencia(struct Diligencia *diligencia) {
     if (diligencia->estado != 0){
         printf("Diligencia id: %d\n", diligencia->id);
