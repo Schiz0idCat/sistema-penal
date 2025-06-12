@@ -454,6 +454,7 @@ void agregarFiscal(struct NodoPersona **fiscales, struct Persona *fiscal) {
     if (*fiscales == NULL) {
         *fiscales = nuevoNodo;
         nuevoNodo->sig = nuevoNodo;
+
         return;
     }
 
