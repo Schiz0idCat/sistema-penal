@@ -211,7 +211,7 @@ struct Persona *buscarImplicadoArbol(struct NodoCaso *siau, char *rut) {
 
     caso = siau->caso;
 
-    for (i = 0; caso->implicados[i] != NULL; i++) {
+    for (i = 0; i < maxImplicados; i++) {
         nodo = caso->implicados[i];
 
         implicado = buscarImplicadoLista(nodo, rut);
@@ -248,7 +248,7 @@ void mostrarImplicadoArbol(struct NodoCaso *siau, const char *rutImplicado) {
 
     caso = siau->caso;
 
-    for (i = 0; caso->implicados[i] != NULL; i++) {
+    for (i = 0; i < maxImplicados; i++) {
         lista = caso->implicados[i];
 
         while (lista != NULL) {
