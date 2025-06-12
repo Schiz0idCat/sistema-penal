@@ -191,6 +191,8 @@ void agregarImplicado(struct NodoPersona **implicados, struct Persona *implicado
     ultimo->sig = nuevo;
 }
 
+// int eliminarImplicado(struct NodoPersona **implicados, char *rut)
+
 struct Persona *buscarImplicadoLista(struct NodoPersona *implicados, char *rut) {
     while (implicados != NULL) {
         if (strcmp(implicados->persona->rut, rut) == 0) {
