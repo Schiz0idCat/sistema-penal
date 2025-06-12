@@ -904,7 +904,7 @@ struct Prueba *crearPrueba() {
 
     prueba = (struct Prueba *)malloc(sizeof(struct Prueba));
     
-    prueba->id = -1;       // id inválido por defecto, hasta que se le asigne uno
+    prueba->id = -1;      // id inválido por defecto, hasta que se le asigne uno
     prueba->estado = 0;   // invisible por defecto
     prueba->data = (char *)malloc(sizeof(char) * maxStrData);
     prueba->responsable = (char *)malloc(sizeof(char) * maxStrNombre);
