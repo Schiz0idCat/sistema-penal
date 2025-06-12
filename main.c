@@ -528,6 +528,7 @@ void mostrarListaFiscales(struct NodoPersona *fiscales) {
 
     do {
         mostrarPersona(actual->persona);
+
         actual = actual->sig;
     } while (actual != fiscales);
 }
