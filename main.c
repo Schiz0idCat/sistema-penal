@@ -927,7 +927,7 @@ struct NodoPrueba *crearNodoPrueba(struct Prueba *prueba) {
 void agregarPrueba(struct NodoPrueba **pruebas, struct Prueba *prueba) {
     struct NodoPrueba *nuevoNodo;
     struct NodoPrueba *ultimo;
-    
+
     nuevoNodo = crearNodoPrueba(prueba);
     ultimo = *pruebas;
 
