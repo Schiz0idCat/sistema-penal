@@ -137,7 +137,7 @@ void inputPersona(struct Persona *persona) {
                 break;
 
             case 3:
-                printf("Saliendo de la creación de la persona...\n");
+                printf("Saliendo de la gestión de persona...\n");
                 break;
 
             default:
