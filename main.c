@@ -146,38 +146,6 @@ void inputPersona(struct Persona *persona) {
     } while (opcion != 3);
 }
 
-void modificarPersona(struct Persona *persona) {
-    int opcion;
-
-    do {
-        printf("\nPersona a modificar:\n\n");
-        mostrarPersona(persona);
-        printf("\n\n1.- Modificar nombre\n");
-        printf("2.- Modificar rut\n");
-        printf("3.- Salir\n");
-        printf("Elija una opción: ");
-        scanf("%d", &opcion);
-
-        switch (opcion) {
-            case 1:
-                printf("\nIngrese el nuevo nombre: ");
-                scanf(" %[^\n]", persona->nombre);
-                printf("Nombre actualizado correctamente.\n");
-                break;
-            case 2:
-                printf("\nIngrese el nuevo RUT: ");
-                scanf(" %[^\n]", persona->rut);
-                printf("RUT actualizado correctamente.\n");
-                break;
-            case 3:
-                printf("\nSaliendo del menú de modificación...\n");
-                break;
-            default:
-                printf("\nOpción inválida. Intente de nuevo.\n");
-        }
-    } while (opcion != 3);
-}
-
 ///////////////////////////////////////////
 ///////////////////////////////////////////
 /////////////    IMPLICADOS   /////////////
@@ -408,7 +376,7 @@ void interaccionListaImplicadosSudo(struct NodoPersona **implicados) {
                         printf("\nNo hay ningún implicado con rut: %s\n", rut);
                     }
                     else {
-                        modificarPersona(implicado);
+                        inputPersona(implicado);
                     }
                 }
                 break;
@@ -693,7 +661,7 @@ void interaccionFiscalesSudo(struct NodoPersona **fiscales) {
                         printf("\nNo hay ningún fiscal con rut: %s\n", rut);
                     }
                     else {
-                        modificarPersona(fiscal);
+                        inputPersona(fiscal);
                     }
                 }
                 break;
@@ -906,7 +874,7 @@ void interaccionJuecesSudo(struct Persona **jueces) {
                         printf("\nNo hay ningún juez con rut: %s\n", rut);
                     }
                     else {
-                        modificarPersona(juez);
+                        inputPersona(juez);
                     }
                 }
                 break;
