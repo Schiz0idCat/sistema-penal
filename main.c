@@ -3,7 +3,7 @@
 #include <string.h>
 
 // Pruebas
-#define maxCategoria 5         // declaraciones, informes, grabaciones, documentos, evidencias
+#define maxCtgPrueba 5         // declaraciones, informes, grabaciones, documentos, evidencias
 #define maxStrData 100         // la información de una prueba almacenada en un string
 
 // Personas
@@ -11,7 +11,7 @@
 #define maxStrNombre 20        // máxima longitud de un nombre
 
 // Casos
-#define maxImplicados 3        // 0: imputado; 1: victima; 2: testigo; 3: tercero
+#define maxCtgImplicados 3     // 0: imputado; 1: victima; 2: testigo; 3: tercero
 #define maxStrRuc 20           // máxima longitud de un ruc
 #define maxDiligencias 100     // máxima cantidad de diligencias por caso
 #define maxStrDescripcion 50   // longitud máxima de la descripción del caso
@@ -211,7 +211,7 @@ struct Persona *buscarImplicadoArbol(struct NodoCaso *siau, char *rut) {
 
     caso = siau->caso;
 
-    for (i = 0; i < maxImplicados; i++) {
+    for (i = 0; i < maxCtgImplicados; i++) {
         nodo = caso->implicados[i];
 
         implicado = buscarImplicadoLista(nodo, rut);
@@ -248,7 +248,7 @@ void mostrarImplicadoArbol(struct NodoCaso *siau, const char *rutImplicado) {
 
     caso = siau->caso;
 
-    for (i = 0; i < maxImplicados; i++) {
+    for (i = 0; i < maxCtgImplicados; i++) {
         lista = caso->implicados[i];
 
         while (lista != NULL) {
@@ -1453,8 +1453,8 @@ struct Caso *crearCaso() {
     caso = (struct Caso *)malloc(sizeof(struct Caso));
 
     caso->fiscal = NULL;
-    caso->implicados = (struct NodoPersona **)malloc(sizeof(struct NodoPersona *) * maxImplicados);
-    caso->categoriasPruebas = (struct NodoPrueba **)malloc(sizeof(struct NodoPrueba *) * maxCategoria);
+    caso->implicados = (struct NodoPersona **)malloc(sizeof(struct NodoPersona *) * maxCtgImplicados);
+    caso->categoriasPruebas = (struct NodoPrueba **)malloc(sizeof(struct NodoPrueba *) * maxCtgPrueba);
     caso->diligencias = (struct Diligencia **)malloc(sizeof(struct Diligencia *) * maxDiligencias);
     caso->pLibreDiligencia = malloc(sizeof(int));
     *caso->pLibreDiligencia = 0;
