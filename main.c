@@ -1137,8 +1137,7 @@ int interaccionResponsablePrueba(struct Prueba *prueba, struct Persona **jueces)
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n");
         }
-    } while (opcion != 1 && opcion != 2 && opcion != 3);
-
+    } while (opcion < 1 || opcion > 3);
     return 0; // se logró agregar un responsable
 }
 
@@ -1478,8 +1477,7 @@ int interaccionInputDiligencia(struct Diligencia *diligencia, struct Persona **j
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n");
         }
-    } while (opcion != 1 && opcion != 2 && opcion != 3);
-
+    } while (opcion < 1 | opcion > 3);
     return 0; // se logró agregar un responsable
 }
 
