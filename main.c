@@ -120,7 +120,7 @@ void inputPersona(struct Persona *persona) {
         printf("\n1.- Ingresar nombre.\n");
         printf("2.- Ingresar rut.\n");
         printf("3.- Salir.\n");
-        printf("Ingrese una opcion: ");
+        printf("Elija una opción: ");
         scanf("%d", &opcion);
 
         switch (opcion) {
@@ -135,7 +135,7 @@ void inputPersona(struct Persona *persona) {
                 break;
 
             case 3: // salir
-                printf("Saliendo de la gestión de persona...\n");
+                printf("\nSaliendo de la gestión de persona...\n");
                 break;
 
             default:
@@ -182,7 +182,32 @@ void agregarImplicado(struct NodoPersona **implicados, struct Persona *implicado
     ultimo->sig = nuevo;
 }
 
-// int eliminarImplicado(struct NodoPersona **implicados, char *rut)
+struct Persona *eliminarImplicado(struct NodoPersona **implicados, char *rut) {
+    struct NodoPersona *act;
+    struct NodoPersona *ant;
+
+    act = *implicados;
+    ant = NULL;
+
+    if (strcmp((*implicados)->persona->rut, rut) == 0) {
+        *implicados = (*implicados)->sig;
+
+        return act->persona;
+    }
+
+    while (act != NULL && strcmp(act->persona->rut, rut) == 0) {
+        ant = act;
+        act = act->sig;
+    }
+
+    if (act == NULL) {
+        return NULL;
+    }
+
+    ant->sig = act->sig;
+
+    return act->persona;
+}
 
 struct Persona *buscarImplicadoLista(struct NodoPersona *implicados, char *rut) {
     while (implicados != NULL) {
@@ -334,11 +359,12 @@ void interaccionListaImplicadosSudo(struct NodoPersona **implicados) {
 
     do {
         printf("\nGESTIÓN DE IMPLICADOS\n");
-        printf("1.- Mostrar implicado.\n");
+        printf("1.- Mostrar implicados.\n");
         printf("2.- Mostrar implicado.\n");
         printf("3.- Agregar implicado.\n");
         printf("4.- Modificar implicado.\n");
-        printf("5.- Salir.\n");
+        printf("5.- Eliminar implicado.\n");
+        printf("6.- Salir.\n");
         printf("Elija una opción: ");
         scanf("%d", &opcion);
 
@@ -396,14 +422,31 @@ void interaccionListaImplicadosSudo(struct NodoPersona **implicados) {
                 }
                 break;
 
-            case 5: // salir de la interfaz
+            case 5: // eliminar
+                if (*implicados == NULL) {
+                    printf("\nNo hay implicados registrados\n");
+                }
+                else {
+                    printf("\nIngrese el rut del implicado a eliminar: ");
+                    scanf(" %[^\n]", rut);
+
+                    if (eliminarImplicado(implicados, rut) == NULL) {
+                        printf("\nNo hay ningún implicado con rut: %s\n", rut);
+                    }
+                    else {
+                        printf("Implicado eliminado exitosamente.\n");
+                    }
+                }
+                break; 
+
+            case 6: // salir de la interfaz
                 printf("\nSaliendo de la interfaz...\n");
                 break;
 
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n"); 
         }
-    } while (opcion != 5);
+    } while (opcion != 6);
 }
 
 void interaccionCategoriasImplicados(struct NodoPersona **implicados, int sudo) {
@@ -1025,6 +1068,7 @@ void modificarPrueba(struct Prueba *prueba) {
         mostrarPrueba(prueba, 1);
         printf("1.- Estado.\n");
         printf("2.- Salir.\n");
+        printf("Elija una opción: ");
         scanf("%d", &opcion);
 
         switch (opcion) {
@@ -1356,7 +1400,7 @@ void modificarDiligencia(struct Diligencia *diligencia) {
         printf("1.- Gravedad.\n");
         printf("2.- Estado.\n");
         printf("3.- Salir.\n");
-        printf("Eliga una opción: ");
+        printf("Elija una opción: ");
         scanf("%d", &opcion);
 
         switch (opcion) {
@@ -1452,7 +1496,7 @@ void interaccionDiligencia(struct Diligencia **diligencias, int *pLibreDiligenci
         printf("2.- Mostrar diligencia.\n");
         printf("3.- Solicitar diligencia.\n");
         printf("4.- Salir.\n");
-        printf("Ingrese una opción: ");
+        printf("Elija una opción: ");
         scanf("%d", &opcion);
 
         switch (opcion) {
@@ -1691,7 +1735,7 @@ void inputCrearCaso(struct Caso *caso, struct Persona *fiscal) {
     printf("Ingrese descripción: ");
     scanf(" %[^\n]", caso->descripcion);
 
-    printf("Ingrese fecha (dd-MM-yyyy)\n");
+    printf("Ingrese fecha (dd-MM-yyyy): ");
     scanf(" %[^\n]", caso->fecha);
 
     printf("Ingresar estado del caso: ");
@@ -1706,7 +1750,7 @@ void modificarCaso(struct Caso *caso, struct Persona **jueces, int sudo) {
     printf("3.- Interactuar implicados.\n");
     printf("4.- Interactuar pruebas.\n");
     printf("5.- Salir\n");
-    printf("Opción: ");
+    printf("Elija una opción: ");
     scanf("%d", &opcion);
 
     do {
@@ -1751,6 +1795,7 @@ void interaccionMostrarCasos(struct NodoCaso *siau) {
         printf("5.- Casos con estado cerrado.\n");
         printf("6.- Mostrar estadísticas.\n");
         printf("7.- Salir.\n");
+        printf("Elija una opción: ");
         scanf("%d", &opcion);
 
         switch (opcion) {
@@ -2104,7 +2149,7 @@ void panelSudo(struct MinPublico *minPublico) {
         printf("2.- Fiscales.\n");
         printf("3.- Casos.\n");
         printf("4.- salir.\n");
-        printf("Elija una opcion: ");
+        printf("Elija una opción: ");
         scanf("%d", &opcion);
 
         switch (opcion) {
@@ -2139,7 +2184,7 @@ void panel(struct MinPublico *minPublico) {
         printf("2.- Fiscales.\n");
         printf("3.- Casos.\n");
         printf("4.- salir.\n");
-        printf("Elija una opcion: ");
+        printf("Elija una opción: ");
         scanf("%d", &opcion);
 
         switch (opcion) {
@@ -2189,7 +2234,7 @@ int main() {
         printf("1.- Administrador.\n");
         printf("2.- Usuario.\n");
         printf("3.- Salir.\n");
-        printf("Escoja una opción: ");
+        printf("Elija una opción: ");
         scanf("%d", &opcion);
 
         switch (opcion) {
@@ -2201,6 +2246,7 @@ int main() {
                     printf("\nContraseña incorrecta\n\n");
                 }
                 else {
+                    printf("\n");
                     panelSudo(minPublico);
                 }
                 break;
