@@ -294,6 +294,7 @@ void interaccionListaImplicados(struct NodoPersona *implicados) {
                     mostrarListaImplicados(implicados);
                 }
                 break;
+
             case 2: // mostrar uno solo
                 if (implicados == NULL) {
                     printf("\nNo hay implicados registrados\n");
@@ -312,9 +313,11 @@ void interaccionListaImplicados(struct NodoPersona *implicados) {
                     }
                 }
                 break;
+
             case 3: // salir de la interfaz
                 printf("\nSaliendo de la interfaz...\n");
                 break;
+
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n"); 
         }
@@ -348,6 +351,7 @@ void interaccionListaImplicadosSudo(struct NodoPersona **implicados) {
                     mostrarListaImplicados(*implicados);
                 }
                 break;
+
             case 2: // mostrar uno solo
                 if (*implicados == NULL) {
                     printf("\nNo hay implicados registrados\n");
@@ -366,11 +370,13 @@ void interaccionListaImplicadosSudo(struct NodoPersona **implicados) {
                     }
                 }
                 break;
+
             case 3: // Agregar
                 implicado = crearPersona();
                 inputPersona(implicado);
                 agregarImplicado(implicados, implicado);
                 break;
+
             case 4: // modificar
                 if (*implicados == NULL) {
                     printf("\nNo hay implicados registrados\n");
@@ -389,9 +395,11 @@ void interaccionListaImplicadosSudo(struct NodoPersona **implicados) {
                     }
                 }
                 break;
+
             case 5: // salir de la interfaz
                 printf("\nSaliendo de la interfaz...\n");
                 break;
+
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n"); 
         }
@@ -417,6 +425,7 @@ void interaccionCategoriasImplicados(struct NodoPersona **implicados, int sudo) 
                 case 5:
                     printf("\nSaliendo de la interfaz...\n");
                     break;
+
                 default:
                     if (sudo == 1) {
                         interaccionListaImplicadosSudo(&implicados[opcion - 1]);
@@ -563,6 +572,7 @@ void interaccionFiscales(struct NodoPersona *fiscales) {
                     mostrarListaFiscales(fiscales);
                 }
                 break;
+
             case 2: // mostrar uno solo
                 if (fiscales == NULL) {
                     printf("\nNo hay fiscales registrados\n");
@@ -581,9 +591,11 @@ void interaccionFiscales(struct NodoPersona *fiscales) {
                     }
                 }
                 break;
+
             case 3: // salir de la interfaz
                 printf("\nSaliendo de la interfaz...\n\n");
                 break;
+
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n"); 
         }
@@ -618,6 +630,7 @@ void interaccionFiscalesSudo(struct NodoPersona **fiscales) {
                     mostrarListaFiscales(*fiscales);
                 }
                 break;
+
             case 2: // mostrar uno solo
                 if (*fiscales == NULL) {
                     printf("\nNo hay fiscales registrados\n");
@@ -636,11 +649,13 @@ void interaccionFiscalesSudo(struct NodoPersona **fiscales) {
                     }
                 }
                 break;
+
             case 3: // Agregar
                 fiscal = crearPersona();
                 inputPersona(fiscal);
                 agregarFiscal(fiscales, fiscal);
                 break;
+
             case 4: // Eliminar eliminar
                 if (*fiscales == NULL) {
                     printf("\nNo hay fiscales registrados\n");
@@ -656,6 +671,7 @@ void interaccionFiscalesSudo(struct NodoPersona **fiscales) {
                     }
                 }
                 break;
+
             case 5: // modificar
                 if (*fiscales == NULL) {
                     printf("\nNo hay fiscales registrados\n");
@@ -674,9 +690,11 @@ void interaccionFiscalesSudo(struct NodoPersona **fiscales) {
                     }
                 }
                 break;
+
             case 6: // salir de la interfaz
                 printf("\nSaliendo de la interfaz...\n\n");
                 break;
+
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n"); 
         }
@@ -774,6 +792,7 @@ void interaccionJueces(struct Persona **jueces) {
                     }
                 }
                 break;
+
             case 2: // mostrar uno solo
                 if (jueces == NULL) {
                     printf("\nNo hay jueces registrados\n");
@@ -792,9 +811,11 @@ void interaccionJueces(struct Persona **jueces) {
                     }
                 }
                 break;
+
             case 3: // salir de la interfaz
                 printf("\nSaliendo de la interfaz...\n\n");
                 break;
+
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n"); 
         }
@@ -831,6 +852,7 @@ void interaccionJuecesSudo(struct Persona **jueces) {
                     }
                 }
                 break;
+
             case 2: // mostrar uno solo
                 if (jueces == NULL) {
                     printf("\nNo hay jueces registrados\n");
@@ -849,11 +871,13 @@ void interaccionJuecesSudo(struct Persona **jueces) {
                     }
                 }
                 break;
+
             case 3: // Agregar
                 juez = crearPersona();
                 inputPersona(juez);
                 agregarJuez(jueces, juez);
                 break;
+
             case 4: // Eliminar eliminar
                 if (jueces == NULL) {
                     printf("\nNo hay jueces registrados\n");
@@ -869,6 +893,7 @@ void interaccionJuecesSudo(struct Persona **jueces) {
                     }
                 }
                 break;
+
             case 5: // modificar
                 if (jueces == NULL) {
                     printf("\nNo hay jueces registrados\n");
@@ -887,9 +912,11 @@ void interaccionJuecesSudo(struct Persona **jueces) {
                     }
                 }
                 break;
+
             case 6: // salir de la interfaz
                 printf("\nSaliendo de la interfaz...\n\n");
                 break;
+
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n"); 
         }
@@ -1008,9 +1035,11 @@ void modificarPrueba(struct Prueba *prueba) {
                 printf("Ingrese un estado: ");
                 scanf("%d", &prueba->estado);
                 break;
+
             case 2:
                 printf("Finalizando la modificación...\n");
                 break;
+
             default:
                 printf("Por favor, elija una opción válida\n");
         }
@@ -1051,13 +1080,16 @@ int interaccionResponsablePrueba(struct Prueba *prueba, struct Persona **jueces)
                     }
                 }
                 break;
+
             case 2:
                 printf("Ingrese la entidad responsable: ");
                 scanf(" %[^\n]", prueba->responsable);
                 break;
+
             case 3:
                 printf("\nSaliendo de la interfaz...\n");
                 return 1; // se sale sin asignar a nadie
+
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n");
         }
@@ -1090,6 +1122,7 @@ void interaccionListaPruebas(struct NodoPrueba *pruebas) {
                     mostrarListaPruebas(pruebas, 0);
                 }
                 break;
+
             case 2: // mostrar uno solo
                 if (pruebas == NULL) {
                     printf("\nNo hay pruebas registrados\n");
@@ -1108,9 +1141,11 @@ void interaccionListaPruebas(struct NodoPrueba *pruebas) {
                     }
                 }
                 break;
+
             case 3: // salir de la interfaz
                 printf("\nSaliendo de la interfaz...\n");
                 break;
+
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n"); 
         }
@@ -1143,6 +1178,7 @@ void interaccionListaPruebasSudo(struct NodoPrueba **pruebas, struct Persona **j
                     mostrarListaPruebas(*pruebas, 1);
                 }
                 break;
+
             case 2: // mostrar uno solo
                 if (*pruebas == NULL) {
                     printf("\nNo hay pruebas registrados\n");
@@ -1161,6 +1197,7 @@ void interaccionListaPruebasSudo(struct NodoPrueba **pruebas, struct Persona **j
                     }
                 }
                 break;
+
             case 3: // Agregar
                 prueba = crearPrueba();
                 if (interaccionResponsablePrueba(prueba, jueces) == 0){
@@ -1168,6 +1205,7 @@ void interaccionListaPruebasSudo(struct NodoPrueba **pruebas, struct Persona **j
                     agregarPrueba(pruebas, prueba);
                 }
                 break;
+
             case 4: // modificar
                 if (*pruebas == NULL) {
                     printf("\nNo hay pruebas registrados\n");
@@ -1186,9 +1224,11 @@ void interaccionListaPruebasSudo(struct NodoPrueba **pruebas, struct Persona **j
                     }
                 }
                 break;
+
             case 5: // salir de la interfaz
                 printf("\nSaliendo de la interfaz...\n");
                 break;
+
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n"); 
         }
@@ -1217,6 +1257,7 @@ void interaccionCategoriasPruebas(struct NodoPrueba **pruebas, struct Persona **
                 case 5:
                     printf("Volviendo a la interfaz de casos...\n");
                     break;
+
                 default:
                     if (sudo == 1) {
                         interaccionListaPruebasSudo(&pruebas[opcion - 1], jueces);
@@ -1323,6 +1364,7 @@ void modificarDiligencia(struct Diligencia *diligencia) {
                 printf("Escala del 1 al 5 (menos grave - más grave): ");
                 scanf("%d", &diligencia->gravedad);
                 break;
+
             case 2:
                 printf("0.- Rechazado (eliminar)\n");
                 printf("1.- Pendiente\n");
@@ -1330,9 +1372,11 @@ void modificarDiligencia(struct Diligencia *diligencia) {
                 printf("Eliga una opción: ");
                 scanf("%d", &diligencia->estado);
                 break;
+
             case 3:
                 printf("Saliendo de la modificación de diligencia...\n");
                 break;
+
             default:
                 printf("Por favor, elija una opción válida\n");
         }
@@ -1377,13 +1421,16 @@ int interaccionInputDiligencia(struct Diligencia *diligencia, struct Persona **j
                     }
                 }
                 break;
+
             case 2:
                 printf("Ingrese la entidad responsable: ");
                 scanf(" %[^\n]", diligencia->responsable->nombre);
                 break;
+
             case 3:
                 printf("\nSaliendo de la interfaz...\n");
                 return 1; // se sale sin asignar a nadie
+
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n");
         }
@@ -1417,6 +1464,7 @@ void interaccionDiligencia(struct Diligencia **diligencias, int *pLibreDiligenci
                     mostrarArregloDiligencias(diligencias);
                 }
                 break;
+
             case 2:
                 printf("\nIngrese el id de la diligencia a mostrar: ");
                 scanf("%d", &id);
@@ -1430,6 +1478,7 @@ void interaccionDiligencia(struct Diligencia **diligencias, int *pLibreDiligenci
                     mostrarDiligencia(diligencia);
                 }
                 break;
+
             case 3:
                 diligencia = crearDiligencia();
                 if (interaccionInputDiligencia(diligencia, jueces) == 0) {
@@ -1437,8 +1486,9 @@ void interaccionDiligencia(struct Diligencia **diligencias, int *pLibreDiligenci
                     agregarDiligencia(diligencias, pLibreDiligencia, diligencia);
                 }
                 break;
-            case 4:
 
+            case 4:
+                printf("Saliendo de la interfaz de diligencias...\n");
                 break;
             default:
                 printf("Por favor, elija una opción válida\n");
@@ -1665,19 +1715,24 @@ void modificarCaso(struct Caso *caso, struct Persona **jueces, int sudo) {
                 printf("Nuevo estado: ");
                 scanf("%d", &caso->estado);
                 break;
+
             case 2:
                 printf("Nueva medida cautelar: ");
                 scanf("%d", &caso->medidaCautelar);
                 break;
+
             case 3:
                 interaccionCategoriasImplicados(caso->implicados, sudo);
                 break;
+
             case 4:
                 interaccionCategoriasPruebas(caso->categoriasPruebas, jueces, sudo);
                 break;
+
             case 5:
                 printf("Saliendo de la interfaz\n");
                 break;
+
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n");
         }
@@ -1703,28 +1758,35 @@ void interaccionMostrarCasos(struct NodoCaso *siau) {
                 printf("\nÁrbol de casos:\n");
                 mostrarArbolCasos(siau);
                 break;
+
             case 2:
                 printf("\nCasos en estado archivado\n");
                 mostrarCasosEstado(siau, opcion - 2);
                 break;
+
             case 3:
                 printf("\nCasos en estado en juicio\n");
                 mostrarCasosEstado(siau, opcion - 2);
                 break;
+
             case 4:
                 printf("\nCasos en estado en investigacón\n");
                 mostrarCasosEstado(siau, opcion - 2);
                 break;
+
             case 5:
                 printf("\nCasos en estado cerrado\n");
                 mostrarCasosEstado(siau, opcion - 2);
                 break;
+
             case 6:
                 mostrarEstadisticas(siau);
                 break;
+
             case 7:
                 printf("Saliendo de la interfaz...\n");
                 break;
+
             default:
                 printf("Por favor, elija una opción válida.\n");
         }
@@ -1757,6 +1819,7 @@ void interaccionCasos(struct NodoCaso *siau, struct Persona **jueces) {
                     interaccionMostrarCasos(siau);
                 }
                 break;
+
             case 2: // Mostrar uno solo
                 if (siau == NULL) {
                     printf("\nNo hay casos registrados\n");
@@ -1800,6 +1863,7 @@ void interaccionCasos(struct NodoCaso *siau, struct Persona **jueces) {
                     }
                 }
                 break;
+
             case 3: // solicitar diligencia
                 if (siau == NULL) {
                     printf("\nNo hay casos a los que solicitar una diligencia.\n");
@@ -1817,9 +1881,11 @@ void interaccionCasos(struct NodoCaso *siau, struct Persona **jueces) {
                     }
                 }
                 break;
+
             case 4: // Salir
                 printf("\nSaliendo de la interfaz...\n\n");
                 break;
+
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n");
         }
@@ -1863,6 +1929,7 @@ void interaccionCasosSudo(struct NodoCaso **siau, struct NodoPersona *fiscales, 
                     interaccionMostrarCasos(*siau);
                 }
                 break;
+
             case 2: // Mostrar uno solo
                 if (*siau == NULL) {
                     printf("\nNo hay casos registrados\n");
@@ -1906,6 +1973,7 @@ void interaccionCasosSudo(struct NodoCaso **siau, struct NodoPersona *fiscales, 
                     }
                 }
                 break;
+
             case 3: // Agregar nuevo caso
                 if (fiscales == NULL) {
                     printf("\nNo hay fiscales a los cuales asignarle un caso.\n");
@@ -1929,6 +1997,7 @@ void interaccionCasosSudo(struct NodoCaso **siau, struct NodoPersona *fiscales, 
                     }
                 }
                 break;
+
             case 4: // modificar
                 if (*siau == NULL) {
                     printf("\nNo hay casos registrados\n");
@@ -1947,6 +2016,7 @@ void interaccionCasosSudo(struct NodoCaso **siau, struct NodoPersona *fiscales, 
                     }
                 }
                 break;
+
             case 5: // mostrar todas las ocurrencias de un implicado
                 if (*siau == NULL) {
                     printf("\nNo hay casos registrados\n");
@@ -1963,6 +2033,7 @@ void interaccionCasosSudo(struct NodoCaso **siau, struct NodoPersona *fiscales, 
                     }
                 }
                 break;
+
             case 6: // solicitar diligencia
                 if (*siau == NULL) {
                     printf("\nNo hay casos a los que solicitar una diligencia.\n");
@@ -1980,6 +2051,7 @@ void interaccionCasosSudo(struct NodoCaso **siau, struct NodoPersona *fiscales, 
                     }
                 }
                 break;
+
             case 7: // modificar diligencia
                 if (*siau == NULL) {
                     printf("\nNo hay casos a los que modificar una diligencia.\n");
@@ -2007,9 +2079,11 @@ void interaccionCasosSudo(struct NodoCaso **siau, struct NodoPersona *fiscales, 
                     }
                 }
                 break;
+
             case 8: // Salir
                 printf("\nSaliendo de la interfaz...\n\n");
                 break;
+
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n");
         }
@@ -2037,15 +2111,19 @@ void panelSudo(struct MinPublico *minPublico) {
             case 1:
                 interaccionJuecesSudo(minPublico->jueces);
                 break;
+
             case 2:
                 interaccionFiscalesSudo(&minPublico->fiscales);
                 break;
+
             case 3:
                 interaccionCasosSudo(&minPublico->siau, minPublico->fiscales, minPublico->jueces);
                 break;
+
             case 4:
                 printf("\nSaliendo del programa...");
                 break;
+
             default:
                 printf("\nPor favor escoja una opción válida.\n\n");
         }
@@ -2068,15 +2146,19 @@ void panel(struct MinPublico *minPublico) {
             case 1:
                 interaccionJueces(minPublico->jueces);
                 break;
+
             case 2:
                 interaccionFiscales(minPublico->fiscales);
                 break;
+
             case 3:
                 interaccionCasos(minPublico->siau, minPublico->jueces);
                 break;
+
             case 4:
                 printf("\nSaliendo del programa...");
                 break;
+
             default:
                 printf("\nPor favor escoja una opción válida.\n\n");
         }
@@ -2122,12 +2204,15 @@ int main() {
                     panelSudo(minPublico);
                 }
                 break;
+
             case 2:
                 panel(minPublico);
                 break;
+
             case 3:
                 printf("Saliendo del programa...\n");
                 break;
+
             default:
                 printf("\nOpción inválida. Intente de nuevo.\n");
         }
