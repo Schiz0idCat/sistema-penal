@@ -245,7 +245,7 @@ void mostrarListaImplicados(struct NodoPersona *implicados) {
     }
 }
 
-void mostrarImplicadoArbol(struct NodoCaso *siau, const char *rutImplicado) {
+void mostrarArbolImplicados(struct NodoCaso *siau, const char *rutImplicado) {
     struct Caso *caso;
     struct NodoPersona *lista;
     int i;
@@ -265,8 +265,8 @@ void mostrarImplicadoArbol(struct NodoCaso *siau, const char *rutImplicado) {
         }
     }
 
-    mostrarImplicadoArbol(siau->izq, rutImplicado);
-    mostrarImplicadoArbol(siau->der, rutImplicado);
+    mostrarArbolImplicados(siau->izq, rutImplicado);
+    mostrarArbolImplicados(siau->der, rutImplicado);
 }
 
 void interaccionListaImplicados(struct NodoPersona *implicados) {
@@ -1959,7 +1959,7 @@ void interaccionCasosSudo(struct NodoCaso **siau, struct NodoPersona *fiscales, 
                         printf("\nNo hay ningún implicado registrado con rut: %s\n", rut);
                     }
                     else {
-                        mostrarImplicadoArbol(*siau, rut);
+                        mostrarArbolImplicados(*siau, rut);
                     }
                 }
                 break;
