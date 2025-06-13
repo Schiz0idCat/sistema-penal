@@ -23,21 +23,19 @@
 // Extra
 #define maxStrPassword 10      // máximo de caracteres para el input de la contraseña
 
-/* con este struct se gestionan:
- * Implicados en el caso (víctimas, imputados, testigos)
- * Ficales
- * Jueces
- */
+// con este struct se gestionan:
+// Implicados en el caso (víctimas, imputados, testigos)
+// Ficales
+// Jueces
 struct Persona {
     char *rut;
     char *nombre;
 };
 
-/* Lista que gestiona personas
- * Consideraciones:
- * - la lista de implicados es simplemente enlazada
- * - la lista de fiscales es circular simplemente enlazada
- */
+// Lista que gestiona personas
+// Consideraciones:
+// - la lista de implicados es simplemente enlazada
+// - la lista de fiscales es circular simplemente enlazada
 struct NodoPersona {
     struct Persona *persona;
     struct NodoPersona *sig;
