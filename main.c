@@ -1444,6 +1444,7 @@ void interaccionDiligencia(struct Diligencia **diligencias, int *pLibreDiligenci
 //==========>   BACKEND   <==========//
 struct Caso *crearCaso() {
     struct Caso *caso;
+    int i;
 
     caso = (struct Caso *)malloc(sizeof(struct Caso));
 
@@ -1459,6 +1460,10 @@ struct Caso *crearCaso() {
     caso->estado = -1; // estado inválido por defecto
     caso->sentencia = -1; // sentencia inválida por defecto
     caso->medidaCautelar = -1; // medida cautelar inválida por defecto
+
+    for (i = 0; i < maxDiligencias; i++) {
+        caso->diligencias[i] = NULL;
+    }
 
     return caso;
 }
@@ -2070,6 +2075,7 @@ void panel(struct MinPublico *minPublico) {
 int main() {
     struct MinPublico *minPublico;
     int opcion;
+    int i;
     char *password;
     char *input;
 
@@ -2077,6 +2083,10 @@ int main() {
     minPublico->fiscales = NULL;
     minPublico->siau = NULL;
     minPublico->jueces = (struct Persona **)malloc(sizeof(struct Persona *) * maxJueces);
+
+    for (i = 0; i < maxJueces; i++) {
+        minPublico->jueces[i] = NULL;
+    }
 
     password = "BitBridge";
     input = (char *)malloc(sizeof(char) * maxStrPassword);
