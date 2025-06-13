@@ -134,7 +134,7 @@ void inputPersona(struct Persona *persona) {
                 scanf(" %[^\n]", persona->rut);
                 break;
 
-            case 3:
+            case 3: // salir
                 printf("Saliendo de la gestión de persona...\n");
                 break;
 
