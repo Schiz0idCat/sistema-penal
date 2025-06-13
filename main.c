@@ -124,12 +124,12 @@ void inputPersona(struct Persona *persona) {
         scanf("%d", &opcion);
 
         switch (opcion) {
-            case 1:
+            case 1: // nombre
                 printf("Ingrese nombre: ");
                 scanf(" %[^\n]", persona->nombre);
                 break;
 
-            case 2:
+            case 2: // rut
                 printf("Ingrese rut: ");
                 scanf(" %[^\n]", persona->rut);
                 break;
@@ -196,30 +196,41 @@ struct Persona *buscarImplicadoLista(struct NodoPersona *implicados, char *rut) 
     return NULL;
 }
 
-struct Persona *buscarImplicadoArbol(struct NodoCaso *siau, char *rut) {
-    struct Caso *caso;
+struct Persona *buscarImplicadoCategoria(struct NodoPersona **implicados, char *rut) {
+    struct NodoPersona *lista;
     struct Persona *implicado;
-    struct NodoPersona *nodo;
     int i;
 
-    caso = siau->caso;
-
     for (i = 0; i < maxCtgImplicados; i++) {
-        nodo = caso->implicados[i];
+        lista = implicados[i];
 
-        implicado = buscarImplicadoLista(nodo, rut);
+        implicado = buscarImplicadoLista(lista, rut);
 
         if (implicado != NULL) {
             return implicado;
         }
     }
 
+    return NULL;
+}
+
+struct Persona *buscarImplicadoArbol(struct NodoCaso *siau, char *rut) {
+    struct Persona *implicado;
+
+    implicado = buscarImplicadoCategoria(siau->caso->implicados, rut);
+
+    if (implicado != NULL) {
+        return implicado;
+    }
+
     implicado = buscarImplicadoArbol(siau->izq, rut);
+
     if (implicado != NULL) {
         return implicado;
     }
 
     implicado = buscarImplicadoArbol(siau->der, rut);
+
     return implicado;
 }
 
@@ -1457,9 +1468,9 @@ struct Caso *crearCaso() {
     caso->ruc = (char *)malloc(sizeof(char) * maxStrRuc);
     caso->descripcion = (char *)malloc(sizeof(char) * maxStrDescripcion);
     caso->fecha = (char *)malloc(sizeof(char) * maxStrFecha);
-    caso->estado = -1; // estado inválido por defecto
-    caso->sentencia = -1; // sentencia inválida por defecto
-    caso->medidaCautelar = -1; // medida cautelar inválida por defecto
+    caso->estado = -1;           // estado inválido por defecto
+    caso->sentencia = -1;        // sentencia inválida por defecto
+    caso->medidaCautelar = -1;   // medida cautelar inválida por defecto
 
     for (i = 0; i < maxDiligencias; i++) {
         caso->diligencias[i] = NULL;
