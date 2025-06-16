@@ -146,6 +146,490 @@ void inputPersona(struct Persona *persona) {
 
 ///////////////////////////////////////////
 ///////////////////////////////////////////
+////////////////    JUEZ   ////////////////
+///////////////////////////////////////////
+///////////////////////////////////////////
+
+//==========>   BACKEND   <==========//
+int agregarJuez(struct Persona **jueces, struct Persona *juez) {
+    int i;
+
+    for (i = 0; i < maxJueces; i++) {
+        if (jueces[i] == NULL) {
+            jueces[i] = juez;
+
+            return 1; // Agregado con éxito
+        }
+    }
+
+    return 0; // No se pudo agregar, el array está lleno
+}
+
+struct Persona *buscarJuez(struct Persona **jueces, char *rut) { 
+    int i;
+
+    for (i = 0; i < maxJueces; i++) {
+        if (jueces[i] != NULL && strcmp(jueces[i]->rut, rut) == 0) {
+            return jueces[i];
+        }
+    }
+
+    return NULL;
+}
+
+int eliminarJuez(struct Persona **jueces, char *rut) {
+    int i;
+
+    for (i = 0; i < maxJueces; i++) {
+        if (jueces[i] != NULL && strcmp(jueces[i]->rut, rut) == 0) {
+            jueces[i] = NULL;
+
+            return 1; // Eliminado con éxito
+        }
+    }
+
+    return 0; // No encontrado
+}
+
+//==========>   FRONTEND   <==========//
+int mostrarArregloJueces(struct Persona **jueces) { 
+    int i;
+    int flag;
+
+    flag = 0; // 0: NO hay jueces; 1: SÍ hay jueces
+
+    for (i = 0; i < maxJueces; i++) {
+        if (jueces[i] != NULL) {
+            mostrarPersona(jueces[i]);
+            flag = 1;
+        }
+    }   
+
+    return flag;
+}
+
+void interaccionJueces(struct Persona **jueces) {
+    struct Persona *juez;
+    char *rut;
+    int opcion;
+    
+    juez = NULL;
+    rut = (char *)malloc(sizeof(char) * maxStrRut);
+
+    do {
+        printf("\nGESTIÓN DE JUECES\n");
+        printf("1.- Mostrar Jueces.\n");
+        printf("2.- Mostrar Juez.\n");
+        printf("3.- Salir.\n");
+        printf("Elija una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1: // mostrar todos
+                if (jueces == NULL) {
+                    printf("\nNo hay jueces registrados\n");
+                }
+                else {
+                    if (mostrarArregloJueces(jueces) == 0) {
+                        printf("\nNo hay jueces registrados\n");
+                    }
+                }
+                break;
+
+            case 2: // mostrar uno solo
+                if (jueces == NULL) {
+                    printf("\nNo hay jueces registrados\n");
+                }
+                else {
+                    printf("\nIngrese el rut del juez a mostrar: ");
+                    scanf(" %[^\n]", rut);
+
+                    juez = buscarJuez(jueces, rut);
+
+                    if (juez == NULL) {
+                        printf("\nNo hay ningún juez con rut: %s\n", rut);
+                    }
+                    else {
+                        mostrarPersona(juez);
+                    }
+                }
+                break;
+
+            case 3: // salir de la interfaz
+                printf("\nSaliendo de la interfaz...\n\n");
+                break;
+
+            default:
+                printf("\nOpción inválida. Intente de nuevo.\n"); 
+        }
+    } while (opcion != 3);
+}
+
+void interaccionJuecesSudo(struct Persona **jueces) {
+    struct Persona *juez;
+    char *rut;
+    int opcion;
+
+    juez = NULL;
+    rut = (char *)malloc(sizeof(char) * maxStrRut);
+
+    do {
+        printf("\nGESTIÓN DE JUECES\n");
+        printf("1.- Mostrar Jueces.\n");
+        printf("2.- Mostrar Juez.\n");
+        printf("3.- Agregar Juez.\n");
+        printf("4.- Eliminar Juez.\n");
+        printf("5.- Modificar Juez.\n");
+        printf("6.- Salir.\n");
+        printf("Elija una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1: // mostrar todos
+                if (jueces == NULL) {
+                    printf("\nNo hay jueces registrados\n");
+                }
+                else {
+                    if (mostrarArregloJueces(jueces) == 0) {
+                        printf("\nNo hay jueces registrados\n");
+                    }
+                }
+                break;
+
+            case 2: // mostrar uno solo
+                if (jueces == NULL) {
+                    printf("\nNo hay jueces registrados\n");
+                }
+                else {
+                    printf("\nIngrese el rut del juez a mostrar: ");
+                    scanf(" %[^\n]", rut);
+
+                    juez = buscarJuez(jueces, rut);
+
+                    if (juez == NULL) {
+                        printf("\nNo hay ningún juez con rut: %s\n", rut);
+                    }
+                    else {
+                        mostrarPersona(juez);
+                    }
+                }
+                break;
+
+            case 3: // Agregar
+                juez = crearPersona();
+                inputPersona(juez);
+                agregarJuez(jueces, juez);
+                break;
+
+            case 4: // Eliminar eliminar
+                if (jueces == NULL) {
+                    printf("\nNo hay jueces registrados\n");
+                }
+                else {
+                    printf("\nIngrese el rut del juez a eliminar: ");
+                    scanf(" %[^\n]", rut);
+
+                    if (eliminarJuez(jueces, rut) == 1) {
+                        printf("\nJuez eliminado correctamente\n");
+                    } else {
+                        printf("\nNo hay ningún juez con rut: %s\n", rut);
+                    }
+                }
+                break;
+
+            case 5: // modificar
+                if (jueces == NULL) {
+                    printf("\nNo hay jueces registrados\n");
+                }
+                else {
+                    printf("\nIngrese el rut del juez a mostrar: ");
+                    scanf(" %[^\n]", rut);
+
+                    juez = buscarJuez(jueces, rut);
+
+                    if (juez == NULL) {
+                        printf("\nNo hay ningún juez con rut: %s\n", rut);
+                    }
+                    else {
+                        inputPersona(juez);
+                    }
+                }
+                break;
+
+            case 6: // salir de la interfaz
+                printf("\nSaliendo de la interfaz...\n\n");
+                break;
+
+            default:
+                printf("\nOpción inválida. Intente de nuevo.\n"); 
+        }
+    } while (opcion != 6);
+}
+
+///////////////////////////////////////////
+///////////////////////////////////////////
+///////////////    FISCAL   ///////////////
+///////////////////////////////////////////
+///////////////////////////////////////////
+
+//==========>   BACKEND   <==========//
+struct NodoPersona *crearNodoFiscal(struct Persona *fiscal) {
+    struct NodoPersona *nuevoNodo;
+
+    nuevoNodo = (struct NodoPersona *)malloc(sizeof(struct NodoPersona));
+    
+    nuevoNodo->persona = fiscal;
+    nuevoNodo->sig = NULL;
+
+    return nuevoNodo;
+}
+
+void agregarFiscal(struct NodoPersona **fiscales, struct Persona *fiscal) { 
+    struct NodoPersona *nuevoNodo;
+    struct NodoPersona *ultimo;
+    
+    nuevoNodo = crearNodoFiscal(fiscal); 
+    ultimo = *fiscales;
+
+    if (*fiscales == NULL) {
+        *fiscales = nuevoNodo;
+        nuevoNodo->sig = nuevoNodo;
+
+        return;
+    }
+
+    while (ultimo->sig != *fiscales) {
+        ultimo = ultimo->sig;
+    }
+
+    ultimo->sig = nuevoNodo;
+    nuevoNodo->sig = *fiscales;
+}
+
+struct Persona *buscarFiscal(struct NodoPersona *fiscales, char *rut) {
+    struct NodoPersona *actual;
+    
+    actual = fiscales;
+
+    do {
+        if (strcmp(actual->persona->rut, rut) == 0) {
+            return actual->persona;
+        }
+
+        actual = actual->sig;
+    } while (actual != fiscales);
+
+    return NULL;
+}
+
+int eliminarFiscal(struct NodoPersona **implicados, char *rut) {
+    struct NodoPersona *ultimo;
+    struct NodoPersona *act;
+    struct NodoPersona *ant;
+    
+    if (strcmp((*implicados)->persona->rut, rut) == 0) {
+        if ((*implicados)->sig == *implicados) {
+            *implicados = NULL;
+        }
+        else {
+            ultimo = *implicados;
+
+            while (ultimo->sig != *implicados) {
+                ultimo = ultimo->sig;
+            }
+
+            *implicados = (*implicados)->sig;
+            ultimo->sig = *implicados;
+        }
+
+        return 1; // eliminado correctamente
+    }
+    
+    act = (*implicados)->sig;
+    ant = *implicados;
+
+    while (act != *implicados) {
+        if (strcmp(act->persona->rut, rut) == 0) {
+            ant->sig = act->sig;
+            return 1; // eliminado correctamente
+        }
+
+        ant = ant->sig;
+        act = act->sig;
+    }
+
+    return 0; // eliminado incorrectamente
+}
+
+//==========>   FRONTEND   <==========//
+void mostrarListaFiscales(struct NodoPersona *fiscales) { 
+    struct NodoPersona *actual;
+
+    actual = fiscales;
+
+    do {
+        mostrarPersona(actual->persona);
+
+        actual = actual->sig;
+    } while (actual != fiscales);
+}
+
+void interaccionFiscales(struct NodoPersona *fiscales) {
+    struct Persona *fiscal;
+    char *rut;
+    int opcion;
+
+    fiscal = NULL;
+    rut = (char *)malloc(sizeof(char) * maxStrRut);
+
+    do {
+        printf("\nGESTIÓN DE FISCALES\n");
+        printf("1.- Mostrar Fiscales.\n");
+        printf("2.- Mostrar Fiscal.\n");
+        printf("3.- Salir.\n");
+        printf("Elija una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1: // mostrar todos
+                if (fiscales == NULL) {
+                    printf("\nNo hay fiscales registrados\n");
+                }
+                else {
+                    mostrarListaFiscales(fiscales);
+                }
+                break;
+
+            case 2: // mostrar uno solo
+                if (fiscales == NULL) {
+                    printf("\nNo hay fiscales registrados\n");
+                }
+                else {
+                    printf("\nIngrese el rut del fiscal a mostrar: ");
+                    scanf(" %[^\n]", rut);
+
+                    fiscal = buscarFiscal(fiscales, rut);
+
+                    if (fiscal == NULL) {
+                        printf("\nNo hay ningún fiscal con rut: %s\n", rut);
+                    }
+                    else {
+                        mostrarPersona(fiscal);
+                    }
+                }
+                break;
+
+            case 3: // salir de la interfaz
+                printf("\nSaliendo de la interfaz...\n\n");
+                break;
+
+            default:
+                printf("\nOpción inválida. Intente de nuevo.\n"); 
+        }
+    } while (opcion != 3);
+}
+
+void interaccionFiscalesSudo(struct NodoPersona **fiscales) {
+    struct Persona *fiscal;
+    char *rut;
+    int opcion;
+    
+    fiscal = NULL;
+    rut = (char *)malloc(sizeof(char) * maxStrRut);
+
+    do {
+        printf("\nGESTIÓN DE FISCALES\n");
+        printf("1.- Mostrar Fiscales.\n");
+        printf("2.- Mostrar Fiscal.\n");
+        printf("3.- Agregar Fiscal.\n");
+        printf("4.- Eliminar Fiscal.\n");
+        printf("5.- Modificar Fiscal.\n");
+        printf("6.- Salir.\n");
+        printf("Elija una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1: // mostrar todos
+                if (*fiscales == NULL) {
+                    printf("\nNo hay fiscales registrados\n");
+                }
+                else {
+                    mostrarListaFiscales(*fiscales);
+                }
+                break;
+
+            case 2: // mostrar uno solo
+                if (*fiscales == NULL) {
+                    printf("\nNo hay fiscales registrados\n");
+                }
+                else {
+                    printf("\nIngrese el rut del fiscal a mostrar: ");
+                    scanf(" %[^\n]", rut);
+
+                    fiscal = buscarFiscal(*fiscales, rut);
+
+                    if (fiscal == NULL) {
+                        printf("\nNo hay ningún fiscal con rut: %s\n", rut);
+                    }
+                    else {
+                        mostrarPersona(fiscal);
+                    }
+                }
+                break;
+
+            case 3: // Agregar
+                fiscal = crearPersona();
+                inputPersona(fiscal);
+                agregarFiscal(fiscales, fiscal);
+                break;
+
+            case 4: // Eliminar eliminar
+                if (*fiscales == NULL) {
+                    printf("\nNo hay fiscales registrados\n");
+                }
+                else {
+                    printf("\nIngrese el rut del fiscal a eliminar: ");
+                    scanf(" %[^\n]", rut);
+
+                    if (eliminarFiscal(fiscales, rut) == 1) {
+                        printf("\nFiscal eliminado correctamente\n");
+                    } else {
+                        printf("\nNo hay ningún fiscal con rut: %s\n", rut);
+                    }
+                }
+                break;
+
+            case 5: // modificar
+                if (*fiscales == NULL) {
+                    printf("\nNo hay fiscales registrados\n");
+                }
+                else {
+                    printf("\nIngrese el rut del fiscal a mostrar: ");
+                    scanf(" %[^\n]", rut);
+
+                    fiscal = buscarFiscal(*fiscales, rut);
+
+                    if (fiscal == NULL) {
+                        printf("\nNo hay ningún fiscal con rut: %s\n", rut);
+                    }
+                    else {
+                        inputPersona(fiscal);
+                    }
+                }
+                break;
+
+            case 6: // salir de la interfaz
+                printf("\nSaliendo de la interfaz...\n\n");
+                break;
+
+            default:
+                printf("\nOpción inválida. Intente de nuevo.\n"); 
+        }
+    } while (opcion != 6);
+}
+
+///////////////////////////////////////////
+///////////////////////////////////////////
 /////////////    IMPLICADOS   /////////////
 ///////////////////////////////////////////
 ///////////////////////////////////////////
@@ -480,490 +964,6 @@ void interaccionCategoriasImplicados(struct NodoPersona **implicados, int sudo) 
             }
         }
     } while (opcion != 4);
-}
-
-///////////////////////////////////////////
-///////////////////////////////////////////
-///////////////    FISCAL   ///////////////
-///////////////////////////////////////////
-///////////////////////////////////////////
-
-//==========>   BACKEND   <==========//
-struct NodoPersona *crearNodoFiscal(struct Persona *fiscal) {
-    struct NodoPersona *nuevoNodo;
-
-    nuevoNodo = (struct NodoPersona *)malloc(sizeof(struct NodoPersona));
-    
-    nuevoNodo->persona = fiscal;
-    nuevoNodo->sig = NULL;
-
-    return nuevoNodo;
-}
-
-void agregarFiscal(struct NodoPersona **fiscales, struct Persona *fiscal) { 
-    struct NodoPersona *nuevoNodo;
-    struct NodoPersona *ultimo;
-    
-    nuevoNodo = crearNodoFiscal(fiscal); 
-    ultimo = *fiscales;
-
-    if (*fiscales == NULL) {
-        *fiscales = nuevoNodo;
-        nuevoNodo->sig = nuevoNodo;
-
-        return;
-    }
-
-    while (ultimo->sig != *fiscales) {
-        ultimo = ultimo->sig;
-    }
-
-    ultimo->sig = nuevoNodo;
-    nuevoNodo->sig = *fiscales;
-}
-
-struct Persona *buscarFiscal(struct NodoPersona *fiscales, char *rut) {
-    struct NodoPersona *actual;
-    
-    actual = fiscales;
-
-    do {
-        if (strcmp(actual->persona->rut, rut) == 0) {
-            return actual->persona;
-        }
-
-        actual = actual->sig;
-    } while (actual != fiscales);
-
-    return NULL;
-}
-
-int eliminarFiscal(struct NodoPersona **implicados, char *rut) {
-    struct NodoPersona *ultimo;
-    struct NodoPersona *act;
-    struct NodoPersona *ant;
-    
-    if (strcmp((*implicados)->persona->rut, rut) == 0) {
-        if ((*implicados)->sig == *implicados) {
-            *implicados = NULL;
-        }
-        else {
-            ultimo = *implicados;
-
-            while (ultimo->sig != *implicados) {
-                ultimo = ultimo->sig;
-            }
-
-            *implicados = (*implicados)->sig;
-            ultimo->sig = *implicados;
-        }
-
-        return 1; // eliminado correctamente
-    }
-    
-    act = (*implicados)->sig;
-    ant = *implicados;
-
-    while (act != *implicados) {
-        if (strcmp(act->persona->rut, rut) == 0) {
-            ant->sig = act->sig;
-            return 1; // eliminado correctamente
-        }
-
-        ant = ant->sig;
-        act = act->sig;
-    }
-
-    return 0; // eliminado incorrectamente
-}
-
-//==========>   FRONTEND   <==========//
-void mostrarListaFiscales(struct NodoPersona *fiscales) { 
-    struct NodoPersona *actual;
-
-    actual = fiscales;
-
-    do {
-        mostrarPersona(actual->persona);
-
-        actual = actual->sig;
-    } while (actual != fiscales);
-}
-
-void interaccionFiscales(struct NodoPersona *fiscales) {
-    struct Persona *fiscal;
-    char *rut;
-    int opcion;
-
-    fiscal = NULL;
-    rut = (char *)malloc(sizeof(char) * maxStrRut);
-
-    do {
-        printf("\nGESTIÓN DE FISCALES\n");
-        printf("1.- Mostrar Fiscales.\n");
-        printf("2.- Mostrar Fiscal.\n");
-        printf("3.- Salir.\n");
-        printf("Elija una opción: ");
-        scanf("%d", &opcion);
-
-        switch (opcion) {
-            case 1: // mostrar todos
-                if (fiscales == NULL) {
-                    printf("\nNo hay fiscales registrados\n");
-                }
-                else {
-                    mostrarListaFiscales(fiscales);
-                }
-                break;
-
-            case 2: // mostrar uno solo
-                if (fiscales == NULL) {
-                    printf("\nNo hay fiscales registrados\n");
-                }
-                else {
-                    printf("\nIngrese el rut del fiscal a mostrar: ");
-                    scanf(" %[^\n]", rut);
-
-                    fiscal = buscarFiscal(fiscales, rut);
-
-                    if (fiscal == NULL) {
-                        printf("\nNo hay ningún fiscal con rut: %s\n", rut);
-                    }
-                    else {
-                        mostrarPersona(fiscal);
-                    }
-                }
-                break;
-
-            case 3: // salir de la interfaz
-                printf("\nSaliendo de la interfaz...\n\n");
-                break;
-
-            default:
-                printf("\nOpción inválida. Intente de nuevo.\n"); 
-        }
-    } while (opcion != 3);
-}
-
-void interaccionFiscalesSudo(struct NodoPersona **fiscales) {
-    struct Persona *fiscal;
-    char *rut;
-    int opcion;
-    
-    fiscal = NULL;
-    rut = (char *)malloc(sizeof(char) * maxStrRut);
-
-    do {
-        printf("\nGESTIÓN DE FISCALES\n");
-        printf("1.- Mostrar Fiscales.\n");
-        printf("2.- Mostrar Fiscal.\n");
-        printf("3.- Agregar Fiscal.\n");
-        printf("4.- Eliminar Fiscal.\n");
-        printf("5.- Modificar Fiscal.\n");
-        printf("6.- Salir.\n");
-        printf("Elija una opción: ");
-        scanf("%d", &opcion);
-
-        switch (opcion) {
-            case 1: // mostrar todos
-                if (*fiscales == NULL) {
-                    printf("\nNo hay fiscales registrados\n");
-                }
-                else {
-                    mostrarListaFiscales(*fiscales);
-                }
-                break;
-
-            case 2: // mostrar uno solo
-                if (*fiscales == NULL) {
-                    printf("\nNo hay fiscales registrados\n");
-                }
-                else {
-                    printf("\nIngrese el rut del fiscal a mostrar: ");
-                    scanf(" %[^\n]", rut);
-
-                    fiscal = buscarFiscal(*fiscales, rut);
-
-                    if (fiscal == NULL) {
-                        printf("\nNo hay ningún fiscal con rut: %s\n", rut);
-                    }
-                    else {
-                        mostrarPersona(fiscal);
-                    }
-                }
-                break;
-
-            case 3: // Agregar
-                fiscal = crearPersona();
-                inputPersona(fiscal);
-                agregarFiscal(fiscales, fiscal);
-                break;
-
-            case 4: // Eliminar eliminar
-                if (*fiscales == NULL) {
-                    printf("\nNo hay fiscales registrados\n");
-                }
-                else {
-                    printf("\nIngrese el rut del fiscal a eliminar: ");
-                    scanf(" %[^\n]", rut);
-
-                    if (eliminarFiscal(fiscales, rut) == 1) {
-                        printf("\nFiscal eliminado correctamente\n");
-                    } else {
-                        printf("\nNo hay ningún fiscal con rut: %s\n", rut);
-                    }
-                }
-                break;
-
-            case 5: // modificar
-                if (*fiscales == NULL) {
-                    printf("\nNo hay fiscales registrados\n");
-                }
-                else {
-                    printf("\nIngrese el rut del fiscal a mostrar: ");
-                    scanf(" %[^\n]", rut);
-
-                    fiscal = buscarFiscal(*fiscales, rut);
-
-                    if (fiscal == NULL) {
-                        printf("\nNo hay ningún fiscal con rut: %s\n", rut);
-                    }
-                    else {
-                        inputPersona(fiscal);
-                    }
-                }
-                break;
-
-            case 6: // salir de la interfaz
-                printf("\nSaliendo de la interfaz...\n\n");
-                break;
-
-            default:
-                printf("\nOpción inválida. Intente de nuevo.\n"); 
-        }
-    } while (opcion != 6);
-}
-
-///////////////////////////////////////////
-///////////////////////////////////////////
-////////////////    JUEZ   ////////////////
-///////////////////////////////////////////
-///////////////////////////////////////////
-
-//==========>   BACKEND   <==========//
-int agregarJuez(struct Persona **jueces, struct Persona *juez) {
-    int i;
-
-    for (i = 0; i < maxJueces; i++) {
-        if (jueces[i] == NULL) {
-            jueces[i] = juez;
-
-            return 1; // Agregado con éxito
-        }
-    }
-
-    return 0; // No se pudo agregar, el array está lleno
-}
-
-struct Persona *buscarJuez(struct Persona **jueces, char *rut) { 
-    int i;
-
-    for (i = 0; i < maxJueces; i++) {
-        if (jueces[i] != NULL && strcmp(jueces[i]->rut, rut) == 0) {
-            return jueces[i];
-        }
-    }
-
-    return NULL;
-}
-
-int eliminarJuez(struct Persona **jueces, char *rut) {
-    int i;
-
-    for (i = 0; i < maxJueces; i++) {
-        if (jueces[i] != NULL && strcmp(jueces[i]->rut, rut) == 0) {
-            jueces[i] = NULL;
-
-            return 1; // Eliminado con éxito
-        }
-    }
-
-    return 0; // No encontrado
-}
-
-//==========>   FRONTEND   <==========//
-int mostrarArregloJueces(struct Persona **jueces) { 
-    int i;
-    int flag;
-
-    flag = 0; // 0: NO hay jueces; 1: SÍ hay jueces
-
-    for (i = 0; i < maxJueces; i++) {
-        if (jueces[i] != NULL) {
-            mostrarPersona(jueces[i]);
-            flag = 1;
-        }
-    }   
-
-    return flag;
-}
-
-void interaccionJueces(struct Persona **jueces) {
-    struct Persona *juez;
-    char *rut;
-    int opcion;
-    
-    juez = NULL;
-    rut = (char *)malloc(sizeof(char) * maxStrRut);
-
-    do {
-        printf("\nGESTIÓN DE JUECES\n");
-        printf("1.- Mostrar Jueces.\n");
-        printf("2.- Mostrar Juez.\n");
-        printf("3.- Salir.\n");
-        printf("Elija una opción: ");
-        scanf("%d", &opcion);
-
-        switch (opcion) {
-            case 1: // mostrar todos
-                if (jueces == NULL) {
-                    printf("\nNo hay jueces registrados\n");
-                }
-                else {
-                    if (mostrarArregloJueces(jueces) == 0) {
-                        printf("\nNo hay jueces registrados\n");
-                    }
-                }
-                break;
-
-            case 2: // mostrar uno solo
-                if (jueces == NULL) {
-                    printf("\nNo hay jueces registrados\n");
-                }
-                else {
-                    printf("\nIngrese el rut del juez a mostrar: ");
-                    scanf(" %[^\n]", rut);
-
-                    juez = buscarJuez(jueces, rut);
-
-                    if (juez == NULL) {
-                        printf("\nNo hay ningún juez con rut: %s\n", rut);
-                    }
-                    else {
-                        mostrarPersona(juez);
-                    }
-                }
-                break;
-
-            case 3: // salir de la interfaz
-                printf("\nSaliendo de la interfaz...\n\n");
-                break;
-
-            default:
-                printf("\nOpción inválida. Intente de nuevo.\n"); 
-        }
-    } while (opcion != 3);
-}
-
-void interaccionJuecesSudo(struct Persona **jueces) {
-    struct Persona *juez;
-    char *rut;
-    int opcion;
-
-    juez = NULL;
-    rut = (char *)malloc(sizeof(char) * maxStrRut);
-
-    do {
-        printf("\nGESTIÓN DE JUECES\n");
-        printf("1.- Mostrar Jueces.\n");
-        printf("2.- Mostrar Juez.\n");
-        printf("3.- Agregar Juez.\n");
-        printf("4.- Eliminar Juez.\n");
-        printf("5.- Modificar Juez.\n");
-        printf("6.- Salir.\n");
-        printf("Elija una opción: ");
-        scanf("%d", &opcion);
-
-        switch (opcion) {
-            case 1: // mostrar todos
-                if (jueces == NULL) {
-                    printf("\nNo hay jueces registrados\n");
-                }
-                else {
-                    if (mostrarArregloJueces(jueces) == 0) {
-                        printf("\nNo hay jueces registrados\n");
-                    }
-                }
-                break;
-
-            case 2: // mostrar uno solo
-                if (jueces == NULL) {
-                    printf("\nNo hay jueces registrados\n");
-                }
-                else {
-                    printf("\nIngrese el rut del juez a mostrar: ");
-                    scanf(" %[^\n]", rut);
-
-                    juez = buscarJuez(jueces, rut);
-
-                    if (juez == NULL) {
-                        printf("\nNo hay ningún juez con rut: %s\n", rut);
-                    }
-                    else {
-                        mostrarPersona(juez);
-                    }
-                }
-                break;
-
-            case 3: // Agregar
-                juez = crearPersona();
-                inputPersona(juez);
-                agregarJuez(jueces, juez);
-                break;
-
-            case 4: // Eliminar eliminar
-                if (jueces == NULL) {
-                    printf("\nNo hay jueces registrados\n");
-                }
-                else {
-                    printf("\nIngrese el rut del juez a eliminar: ");
-                    scanf(" %[^\n]", rut);
-
-                    if (eliminarJuez(jueces, rut) == 1) {
-                        printf("\nJuez eliminado correctamente\n");
-                    } else {
-                        printf("\nNo hay ningún juez con rut: %s\n", rut);
-                    }
-                }
-                break;
-
-            case 5: // modificar
-                if (jueces == NULL) {
-                    printf("\nNo hay jueces registrados\n");
-                }
-                else {
-                    printf("\nIngrese el rut del juez a mostrar: ");
-                    scanf(" %[^\n]", rut);
-
-                    juez = buscarJuez(jueces, rut);
-
-                    if (juez == NULL) {
-                        printf("\nNo hay ningún juez con rut: %s\n", rut);
-                    }
-                    else {
-                        inputPersona(juez);
-                    }
-                }
-                break;
-
-            case 6: // salir de la interfaz
-                printf("\nSaliendo de la interfaz...\n\n");
-                break;
-
-            default:
-                printf("\nOpción inválida. Intente de nuevo.\n"); 
-        }
-    } while (opcion != 6);
 }
 
 ///////////////////////////////////////////
