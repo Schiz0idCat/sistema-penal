@@ -187,7 +187,7 @@ void ordenarJuecesPorRut(struct Persona **jueces, int pLibre) {
     }
 }
 
-int agregarJuez(struct Persona **jueces, struct Persona *juez, int *pLibre) {
+int agregarJuez(struct Persona **jueces, int *pLibre, struct Persona *juez) {
     if (*pLibre > maxJueces) {
         return 0; // No se pudo agregar, el array está lleno
     }
@@ -197,12 +197,24 @@ int agregarJuez(struct Persona **jueces, struct Persona *juez, int *pLibre) {
     return 1; // Agregado con éxito
 }
 
-struct Persona *buscarJuez(struct Persona **jueces, char *rut) { 
-    int i;
+struct Persona *buscarJuez(struct Persona **jueces, int pLibre, char *rut) { 
+    int izq, der, mitad, cmp;
 
-    for (i = 0; i < maxJueces; i++) {
-        if (jueces[i] != NULL && strcmp(jueces[i]->rut, rut) == 0) {
-            return jueces[i];
+    izq = 0;
+    der = pLibre - 1;
+
+    while (izq <= der) {
+        mitad = (izq + der) / 2;
+        cmp = strcmp(jueces[mitad]->rut, rut);
+
+        if (cmp == 0) {
+            return jueces[mitad];
+        }
+        else if (cmp < 0) {
+            izq = mitad + 1;
+        }
+        else {
+            der = mitad - 1;
         }
     }
 
@@ -243,7 +255,7 @@ int mostrarArregloJueces(struct Persona **jueces) {
     return flag;
 }
 
-void interaccionJueces(struct Persona **jueces) {
+void interaccionJueces(struct Persona **jueces, int pLibre) {
     struct Persona *juez;
     char *rut;
     int opcion;
@@ -279,7 +291,7 @@ void interaccionJueces(struct Persona **jueces) {
                     printf("\nIngrese el rut del juez a mostrar: ");
                     scanf(" %[^\n]", rut);
 
-                    juez = buscarJuez(jueces, rut);
+                    juez = buscarJuez(jueces, pLibre, rut);
 
                     if (juez == NULL) {
                         printf("\nNo hay ningún juez con rut: %s\n", rut);
@@ -339,7 +351,7 @@ void interaccionJuecesSudo(struct Persona **jueces, int *pLibre) {
                     printf("\nIngrese el rut del juez a mostrar: ");
                     scanf(" %[^\n]", rut);
 
-                    juez = buscarJuez(jueces, rut);
+                    juez = buscarJuez(jueces, *pLibre, rut);
 
                     if (juez == NULL) {
                         printf("\nNo hay ningún juez con rut: %s\n", rut);
@@ -353,7 +365,7 @@ void interaccionJuecesSudo(struct Persona **jueces, int *pLibre) {
             case 3: // Agregar
                 juez = crearPersona();
                 inputPersona(juez);
-                if (agregarJuez(jueces, juez, pLibre) == 1) {
+                if (agregarJuez(jueces, pLibre, juez) == 1) {
                     ordenarJuecesPorRut(jueces, *pLibre);
                 }
                 else {
@@ -386,7 +398,7 @@ void interaccionJuecesSudo(struct Persona **jueces, int *pLibre) {
                     printf("\nIngrese el rut del juez a mostrar: ");
                     scanf(" %[^\n]", rut);
 
-                    juez = buscarJuez(jueces, rut);
+                    juez = buscarJuez(jueces, *pLibre, rut);
 
                     if (juez == NULL) {
                         printf("\nNo hay ningún juez con rut: %s\n", rut);
@@ -1131,7 +1143,7 @@ void modificarPrueba(struct Prueba *prueba) {
     } while (opcion != 2);
 }
 
-int interaccionResponsablePrueba(struct Prueba *prueba, struct Persona **jueces) {
+int interaccionResponsablePrueba(struct Prueba *prueba, struct Persona **jueces, int pLibre) {
     int opcion;
     char *responsable;
 
@@ -1156,7 +1168,7 @@ int interaccionResponsablePrueba(struct Prueba *prueba, struct Persona **jueces)
                     printf("\nIngrese el rut del juez: ");
                     scanf(" %[^\n]", responsable);
 
-                    if (buscarJuez(jueces, responsable) == NULL) {
+                    if (buscarJuez(jueces, pLibre, responsable) == NULL) {
                         printf("\nNo hay ningún juez con rut: %s\n", responsable);
                         return 1; // no se logra asignar juez
                     }
@@ -1236,7 +1248,7 @@ void interaccionListaPruebas(struct NodoPrueba *pruebas) {
     } while (opcion != 3);
 }
 
-void interaccionListaPruebasSudo(struct NodoPrueba **pruebas, struct Persona **jueces) {
+void interaccionListaPruebasSudo(struct NodoPrueba **pruebas, struct Persona **jueces, int pLibre) {
     struct Prueba *prueba;
     int id;
     int opcion;
@@ -1284,7 +1296,7 @@ void interaccionListaPruebasSudo(struct NodoPrueba **pruebas, struct Persona **j
 
             case 3: // Agregar
                 prueba = crearPrueba();
-                if (interaccionResponsablePrueba(prueba, jueces) == 0){
+                if (interaccionResponsablePrueba(prueba, jueces, pLibre) == 0){
                     inputCrearPrueba(prueba);
                     agregarPrueba(pruebas, prueba);
                 }
@@ -1319,7 +1331,7 @@ void interaccionListaPruebasSudo(struct NodoPrueba **pruebas, struct Persona **j
     } while (opcion != 5);
 }
 
-void interaccionCategoriasPruebas(struct NodoPrueba **pruebas, struct Persona **jueces, int sudo) {
+void interaccionCategoriasPruebas(struct NodoPrueba **pruebas, struct Persona **jueces, int pLibre, int sudo) {
     int opcion;
 
     do {
@@ -1344,7 +1356,7 @@ void interaccionCategoriasPruebas(struct NodoPrueba **pruebas, struct Persona **
 
                 default:
                     if (sudo == 1) {
-                        interaccionListaPruebasSudo(&pruebas[opcion - 1], jueces);
+                        interaccionListaPruebasSudo(&pruebas[opcion - 1], jueces, pLibre);
                     }
                     else {
                         interaccionListaPruebas(pruebas[opcion - 1]);
@@ -1467,7 +1479,7 @@ void modificarDiligencia(struct Diligencia *diligencia) {
     } while (opcion != 3);
 }
 
-int interaccionInputDiligencia(struct Diligencia *diligencia, struct Persona **jueces) {
+int interaccionInputDiligencia(struct Diligencia *diligencia, struct Persona **jueces, int pLibre) {
     struct Persona *responsable;
     char *rut;
     int opcion;
@@ -1494,7 +1506,7 @@ int interaccionInputDiligencia(struct Diligencia *diligencia, struct Persona **j
                     printf("\nIngrese el rut del juez: ");
                     scanf(" %[^\n]", rut);
 
-                    responsable = buscarJuez(jueces, rut);
+                    responsable = buscarJuez(jueces, pLibre, rut);
 
                     if (responsable == NULL) {
                         printf("\nNo hay ningún juez con rut: %s\n", rut);
@@ -1522,7 +1534,7 @@ int interaccionInputDiligencia(struct Diligencia *diligencia, struct Persona **j
     return 0; // se logró agregar un responsable
 }
 
-void interaccionDiligencia(struct Diligencia **diligencias, int *pLibreDiligencia, struct Persona **jueces) {
+void interaccionDiligencia(struct Diligencia **diligencias, int *pLibreDiligencia, struct Persona **jueces, int pLibreJueces) {
     struct Diligencia *diligencia;
     int id;
     int opcion;
@@ -1564,7 +1576,7 @@ void interaccionDiligencia(struct Diligencia **diligencias, int *pLibreDiligenci
 
             case 3:
                 diligencia = crearDiligencia();
-                if (interaccionInputDiligencia(diligencia, jueces) == 0) {
+                if (interaccionInputDiligencia(diligencia, jueces, pLibreJueces) == 0) {
                     inputCrearDiligencia(diligencia);
                     agregarDiligencia(diligencias, pLibreDiligencia, diligencia);
                 }
@@ -1801,7 +1813,7 @@ void inputCrearCaso(struct Caso *caso, struct Persona *fiscal) {
     scanf("%d", &caso->estado);
 }
 
-void modificarCaso(struct Caso *caso, struct Persona **jueces, int sudo) {
+void modificarCaso(struct Caso *caso, struct Persona **jueces, int pLibre, int sudo) {
     int opcion;
     printf("Modificar caso con RUC: %s\n", caso->ruc);
     printf("1.- Cambiar estado.\n");
@@ -1829,7 +1841,7 @@ void modificarCaso(struct Caso *caso, struct Persona **jueces, int sudo) {
                 break;
 
             case 4:
-                interaccionCategoriasPruebas(caso->categoriasPruebas, jueces, sudo);
+                interaccionCategoriasPruebas(caso->categoriasPruebas, jueces, pLibre, sudo);
                 break;
 
             case 5:
@@ -1897,7 +1909,7 @@ void interaccionMostrarCasos(struct NodoCaso *siau) {
     } while (opcion != 7);
 }
 
-void interaccionCasos(struct NodoCaso *siau, struct Persona **jueces) {
+void interaccionCasos(struct NodoCaso *siau, struct Persona **jueces, int pLibre) {
     struct Caso *caso;
     char *ruc;
     int opcion;
@@ -1981,7 +1993,7 @@ void interaccionCasos(struct NodoCaso *siau, struct Persona **jueces) {
                     if (caso == NULL) {
                         printf("\nNo se encontró ningún caso con RUC: %s\n", ruc);
                     } else {
-                        interaccionDiligencia(caso->diligencias, caso->pLibreDiligencia, jueces);
+                        interaccionDiligencia(caso->diligencias, caso->pLibreDiligencia, jueces, pLibre);
                     }
                 }
                 break;
@@ -1996,7 +2008,7 @@ void interaccionCasos(struct NodoCaso *siau, struct Persona **jueces) {
     } while (opcion != 4);
 }
 
-void interaccionCasosSudo(struct NodoCaso **siau, struct NodoPersona *fiscales, struct Persona **jueces) {
+void interaccionCasosSudo(struct NodoCaso **siau, struct NodoPersona *fiscales, struct Persona **jueces, int pLibre) {
     struct Caso *caso;
     struct Persona *fiscal;
     struct Diligencia *diligencia;
@@ -2097,7 +2109,7 @@ void interaccionCasosSudo(struct NodoCaso **siau, struct NodoPersona *fiscales, 
                         inputCrearCaso(caso, fiscal);
                         agregarCaso(siau, caso);
                         interaccionCategoriasImplicados(caso->implicados, 1);
-                        interaccionCategoriasPruebas(caso->categoriasPruebas, jueces, 1);
+                        interaccionCategoriasPruebas(caso->categoriasPruebas, jueces, pLibre, 1);
                     }
                 }
                 break;
@@ -2116,7 +2128,7 @@ void interaccionCasosSudo(struct NodoCaso **siau, struct NodoPersona *fiscales, 
                         printf("\nNo hay ningún caso con RUC: %s\n", ruc);
                     }
                     else {
-                        modificarCaso(caso, jueces, 1);
+                        modificarCaso(caso, jueces, pLibre, 1);
                     }
                 }
                 break;
@@ -2151,7 +2163,7 @@ void interaccionCasosSudo(struct NodoCaso **siau, struct NodoPersona *fiscales, 
                     if (caso == NULL) {
                         printf("\nNo se encontró ningún caso con RUC: %s\n", ruc);
                     } else {
-                        interaccionDiligencia(caso->diligencias, caso->pLibreDiligencia, jueces);
+                        interaccionDiligencia(caso->diligencias, caso->pLibreDiligencia, jueces, pLibre);
                     }
                 }
                 break;
@@ -2221,7 +2233,7 @@ void panelSudo(struct MinPublico *minPublico) {
                 break;
 
             case 3:
-                interaccionCasosSudo(&minPublico->siau, minPublico->fiscales, minPublico->jueces);
+                interaccionCasosSudo(&minPublico->siau, minPublico->fiscales, minPublico->jueces, *minPublico->pLibreJueces);
                 break;
 
             case 4:
@@ -2248,7 +2260,7 @@ void panel(struct MinPublico *minPublico) {
 
         switch (opcion) {
             case 1:
-                interaccionJueces(minPublico->jueces);
+                interaccionJueces(minPublico->jueces, *minPublico->pLibreJueces);
                 break;
 
             case 2:
@@ -2256,7 +2268,7 @@ void panel(struct MinPublico *minPublico) {
                 break;
 
             case 3:
-                interaccionCasos(minPublico->siau, minPublico->jueces);
+                interaccionCasos(minPublico->siau, minPublico->jueces, *minPublico->pLibreJueces);
                 break;
 
             case 4:
