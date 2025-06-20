@@ -83,6 +83,7 @@ struct NodoCaso {
 
 struct MinPublico {
     struct Persona **jueces;        // Array de jueces
+    int *pLibreJueces;              // última posición libre de jueces
     struct NodoPersona *fiscales;   // circular simple
     struct NodoCaso *siau;          // árbol
 };
@@ -151,18 +152,49 @@ void inputPersona(struct Persona *persona) {
 ///////////////////////////////////////////
 
 //==========>   BACKEND   <==========//
-int agregarJuez(struct Persona **jueces, struct Persona *juez) {
+void compactarJueces(struct Persona **jueces, int *pLibre) {
     int i;
+    *pLibre = 0;
 
     for (i = 0; i < maxJueces; i++) {
-        if (jueces[i] == NULL) {
-            jueces[i] = juez;
-
-            return 1; // Agregado con éxito
+        if (jueces[i] != NULL) {
+            if (i != *pLibre) {
+                jueces[*pLibre] = jueces[i];
+                jueces[i] = NULL;
+            }
+            (*pLibre)++;
         }
     }
+}
 
-    return 0; // No se pudo agregar, el array está lleno
+void ordenarJuecesPorRut(struct Persona **jueces, int pLibre) {
+    struct Persona *aux;
+    int i, j, flag;
+
+    for (i = 0; i < pLibre - 1; i++) {
+        flag = 0;
+
+        for (j = 0; j < pLibre - i - 1; j++) {
+            if (strcmp(jueces[j]->rut, jueces[j + 1]->rut) > 0) {
+                aux = jueces[j];
+                jueces[j] = jueces[j + 1];
+                jueces[j + 1] = aux;
+                flag = 1;
+            }
+
+            if (!flag) break; // Ya está ordenado
+        }
+    }
+}
+
+int agregarJuez(struct Persona **jueces, struct Persona *juez, int *pLibre) {
+    if (*pLibre > maxJueces) {
+        return 0; // No se pudo agregar, el array está lleno
+    }
+
+    jueces[(*pLibre)++] = juez;
+
+    return 1; // Agregado con éxito
 }
 
 struct Persona *buscarJuez(struct Persona **jueces, char *rut) { 
@@ -200,7 +232,10 @@ int mostrarArregloJueces(struct Persona **jueces) {
 
     for (i = 0; i < maxJueces; i++) {
         if (jueces[i] != NULL) {
+            printf("\n");
+
             mostrarPersona(jueces[i]);
+
             flag = 1;
         }
     }   
@@ -265,7 +300,7 @@ void interaccionJueces(struct Persona **jueces) {
     } while (opcion != 3);
 }
 
-void interaccionJuecesSudo(struct Persona **jueces) {
+void interaccionJuecesSudo(struct Persona **jueces, int *pLibre) {
     struct Persona *juez;
     char *rut;
     int opcion;
@@ -318,7 +353,12 @@ void interaccionJuecesSudo(struct Persona **jueces) {
             case 3: // Agregar
                 juez = crearPersona();
                 inputPersona(juez);
-                agregarJuez(jueces, juez);
+                if (agregarJuez(jueces, juez, pLibre) == 1) {
+                    ordenarJuecesPorRut(jueces, *pLibre);
+                }
+                else {
+                    printf("No se pudo agregar al juez.\n");
+                }
                 break;
 
             case 4: // Eliminar eliminar
@@ -331,6 +371,7 @@ void interaccionJuecesSudo(struct Persona **jueces) {
 
                     if (eliminarJuez(jueces, rut) == 1) {
                         printf("\nJuez eliminado correctamente\n");
+                        compactarJueces(jueces, pLibre);
                     } else {
                         printf("\nNo hay ningún juez con rut: %s\n", rut);
                     }
@@ -2152,7 +2193,7 @@ void panelSudo(struct MinPublico *minPublico) {
 
         switch (opcion) {
             case 1:
-                interaccionJuecesSudo(minPublico->jueces);
+                interaccionJuecesSudo(minPublico->jueces, minPublico->pLibreJueces);
                 break;
 
             case 2:
@@ -2219,6 +2260,8 @@ int main() {
     minPublico->fiscales = NULL;
     minPublico->siau = NULL;
     minPublico->jueces = (struct Persona **)malloc(sizeof(struct Persona *) * maxJueces);
+    minPublico->pLibreJueces = (int *)malloc(sizeof(int));
+    *(minPublico->pLibreJueces) = 0;
 
     for (i = 0; i < maxJueces; i++) {
         minPublico->jueces[i] = NULL;
