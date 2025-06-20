@@ -1634,6 +1634,10 @@ void agregarCaso(struct NodoCaso **siau, struct Caso *caso) {
 }
 
 struct Caso *buscarCasoRuc(struct NodoCaso *siau, char *ruc) {
+    if (siau == NULL) {
+        return NULL;
+    }
+
     if (strcmp(siau->caso->ruc, ruc) == 0) {
         return siau->caso;
     }
@@ -1644,6 +1648,10 @@ struct Caso *buscarCasoRuc(struct NodoCaso *siau, char *ruc) {
 }
 
 int casosAbiertos(struct NodoCaso *siau) {
+    if (siau == NULL) {
+        return 0;
+    }
+
     int total;
     int izquierda;
     int derecha;
@@ -1663,6 +1671,10 @@ int casosAbiertos(struct NodoCaso *siau) {
 }
 
 int sentenciasCondenatorias(struct NodoCaso *siau) {
+    if (siau == NULL) {
+        return 0;
+    }
+
     int total;
     int izquierda;
     int derecha;
@@ -1682,6 +1694,10 @@ int sentenciasCondenatorias(struct NodoCaso *siau) {
 }
 
 int casosArchivados(struct NodoCaso *siau) {
+    if (siau == NULL) {
+        return 0;
+    }
+
     int total;
     int izquierda;
     int derecha;
@@ -1701,6 +1717,10 @@ int casosArchivados(struct NodoCaso *siau) {
 }
 
 int casosConMedidaCautelar(struct NodoCaso *siau) {
+    if (siau == NULL) {
+        return 0;
+    }
+
     int total;
     int izquierda;
     int derecha;
