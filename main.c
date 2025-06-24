@@ -1815,7 +1815,8 @@ void inputCrearCaso(struct Caso *caso, struct Persona *fiscal) {
 
 void modificarCaso(struct Caso *caso, struct Persona **jueces, int pLibre, int sudo) {
     int opcion;
-    printf("Modificar caso con RUC: %s\n", caso->ruc);
+    printf("Modificar caso.\n");
+    mostrarCaso(caso);
     printf("1.- Cambiar estado.\n");
     printf("2.- Cambiar medida cautelar.\n");
     printf("3.- Interactuar implicados.\n");
